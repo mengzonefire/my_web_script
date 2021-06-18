@@ -10,7 +10,7 @@
 
 ## 脚本说明
 
-使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.githubassets.com/favicons/favicon.png) GitHub](https://github.com/mengzonefire/dupan-rapid-extract/blob/master/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
+使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
 
 支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：https://pan.baidu.com/#bdlink=[参数]，参数为base64加密过的任意格式链接 (支持批量)
 
