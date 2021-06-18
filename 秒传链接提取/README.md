@@ -6,7 +6,7 @@
 
 脚本的完整使用教程(包括安装脚本、提取、生成秒传)可参考视频教程：[秒传教程[视频版]](https://www.bilibili.com/video/BV1E5411H76K)
 
-生成&分享过程中遇到问题(例如秒传无效/md5获取失败等)可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
+生成&分享过程中遇到问题(例如秒传无效/md5获取失败/文件和谐)可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
 
 ## 脚本说明
 
