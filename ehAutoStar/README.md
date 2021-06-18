@@ -14,7 +14,7 @@
 
 <p></p>
 
-<p>在上传者页面（https://e-hentai.org/uploader/xxxx），会有一键评分按钮，在右侧输入框输入数值</p>
+<p>在上传者页面 `https://e-hentai.org/uploader/xxxx`，会有一键评分按钮，在右侧输入框输入数值</p>
 
 <p>再点击&ldquo;一键评分&rdquo;按钮，即可给当前页显示的所有画廊评分。</p>
 
