@@ -1,3 +1,5 @@
+重新上传脚本及原介绍页, 并继续维护
+
 ## 相关教程
 
 脚本<span style="color: rgb(209, 72, 65);"> 不能正常使用 </span>或<span style="color: rgb(209, 72, 65);"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
@@ -35,6 +37,8 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 3. 火狐firefox用户使用会员账号生成秒传时, 会报 "文件获取失败(#403)", 通过 [UA切换插件](https://addons.mozilla.org/zh-CN/firefox/addon/uaswitcher) 切换为Chrome的UA, 即可解决
 
 ## 更新历史
+
+21.6.18更新：移除<span style="color: rgb(209, 72, 65);"> 修复下载 </span>功能(已在21年4月上旬失效), 后续不会再考虑修复该功能
 
 21.3.30更新：修复部分秒传转存提示 "文件不存在" 或 "md5不匹配", 有该情况的请务必更新到1.6.7版本
 

@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.6.7
+// @version         1.6.8
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
-// @supportURL      https://github.com/mengzonefire/dupan-rapid-extract/issues
 // @contributionURL https://afdian.net/@mengzonefire
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
@@ -30,9 +29,6 @@
     const info_url = 'https://pan.baidu.com/rest/2.0/xpan/nas?method=uinfo';
     const api_url = 'http://pan.baidu.com/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
-    const create_url = 'https://pan.baidu.com/api/create?bdstoken=';
-    const precreate_url = 'https://pan.baidu.com/api/precreate';
-    const bdstoken_url = 'https://pan.baidu.com/api/gettemplatevariable';
     const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
     //使用'250528', '265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
@@ -132,7 +128,7 @@
       cursor: pointer;
       margin-left: 4px;
     }
-  
+
     input[type='checkbox']:not(.switch) {
       border-radius: 7px;
     }
@@ -178,21 +174,19 @@
         interval_mode = false,
         file_info_list = [],
         gen_success_list = [],
-        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, fix_dl, bdstoken;
+        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list;
     const myStyle = `style="width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;"`;
     const myBtnStyle = `style="height: 26px;line-height: 26px;vertical-align: middle;"`;
     const html_btn = `<a class="g-button g-button-blue" id="bdlink_btn" title="秒传链接" style="display: inline-block;"">
     <span class="g-button-right"><em class="icon icon-disk" title="秒传链接提取"></em><span class="text" style="width: auto;">秒传链接</span></span></a>`;
     const html_btn_gen = `<a class="g-button" id="gen-bdlink-button"><span class="g-button-right"><em class="icon icon-share"></em><span class="text" style="width: auto;">生成秒传</span></span></a>`;
-    const html_fix_dl = `<a class="g-button" id="fix-dl-button"><span class="g-button-right"><em class="icon icon-grid"></em><span class="text" style="width: auto;">修复下载</span></span></a>`;
     const html_check_md5 = `<p ${myStyle}>测试秒传, 可防止秒传失效<a class="g-button g-button-blue" id="check_md5_btn" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">测试</span></span></a></p>`;
-    const html_document = `<p ${myStyle}>生成过程中遇到问题可参考<a class="g-button g-button-blue" ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">分享教程</span></span></a></p>`;
+    const html_document = `<p ${myStyle}>秒传无效/md5获取失败/防和谐 可参考<a class="g-button g-button-blue" ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">分享教程</span></span></a></p>`;
     const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者
     <a class="g-button" id="kill_donate" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></span></a></p>`;
     const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a href="https://greasyfork.org/zh-CN/scripts/397324" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
     <a class="g-button" id="kill_feedback" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></span></a></p>`;
     const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"总是允许"或"总是允许全部"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
-    const fix_dl_checkbox = '<input id="fix_dl_checkbox" type="checkbox" value="1"><label for="fix_dl_checkbox">修复下载</label><p>修复无法下载的文件, 勾选并重新转存即可修复</p><p>(默认覆盖文件, 请先尝试直接转存, 若不能下载再勾选)</p>';
     var checkbox_par = {
         input: 'checkbox',
         inputValue: GM_getValue('with_path'),
@@ -347,195 +341,9 @@
         }
     }
 
-    function fix_dl_event() {
-        select_list = getSelectedFileList();
-        if (!GM_getValue('fix_no_first')) {
-            Swal.fire({
-                title: '首次使用请注意',
-                showCloseButton: true,
-                allowOutsideClick: false,
-                html: csd_hint_html,
-            }).then((result) => {
-                if (result.value) {
-                    GM_setValue('fix_no_first', true);
-                    get_bdstoken();
-                }
-            });
-            return;
-        } else {
-            get_bdstoken();
-        }
-
-    }
-
-    function fix_dl_begain() {
-        Swal.fire({
-            title: `文件修复中`,
-            showconfirmButton: false,
-            showCancelButton: false,
-            allowOutsideClick: false,
-            onBeforeOpen: () => {
-                Swal.showLoading()
-            }
-        });
-    }
-
-    function get_bdstoken() {
-        if (bdstoken) {
-            fix_dl_begain();
-            try_get_true_md5(0);
-            return;
-        }
-        $.ajax({
-            url: bdstoken_url,
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                fields: JSON.stringify(["bdstoken"])
-            }
-        }).success(function (r) {
-            if (!r.errno) {
-                bdstoken = r.result.bdstoken;
-                fix_dl_begain();
-                try_get_true_md5(0);
-            } else {
-                alert('获取bdstoken失败, 请尝试重新登录');
-            }
-        }).fail(function (r) {
-            alert('获取bdstoken失败, 请尝试刷新页面');
-        });
-    }
-
-    function try_get_true_md5(file_id) {
-        if (file_id >= select_list.length) {
-            fix_dl_precreate(0);
-        } else if (!select_list[file_id].isdir) {
-            var file_info = {};
-            file_info_list.push(file_info);
-            file_info.path = select_list[file_id].path;
-            var get_md5_par = {
-                url: meta_url + encodeURIComponent(file_info.path),
-                type: 'GET',
-                responseType: 'json',
-                onload: function (r) {
-                    var mate_info = r.response.list[0];
-                    file_info.size = mate_info.size;
-                    if (mate_info.block_list.length === 1) {
-                        file_info.md5 = mate_info.block_list[0];
-                    } else
-                    if (mate_info.md5.match(/[\da-f]{32}/i)) {
-                        file_info.md5 = mate_info.md5;
-                    } else {
-                        file_info.errno = 888;
-                    }
-                    try_get_true_md5(file_id + 1);
-                }
-            };
-            GM_xmlhttpRequest(get_md5_par);
-        } else {
-            try_get_true_md5(file_id + 1);
-        }
-    }
-
-    function fix_dl_finish() {
-        var fix_failed = 0;
-        var failed_info = '';
-        file_info_list.forEach(function (item) {
-            if (item.hasOwnProperty('errno')) {
-                fix_failed++;
-                failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno, item.size)}(#${item.errno})</p>`
-            }
-        });
-        Swal.fire({
-            title: `修复完毕 共${file_info_list.length}个, 失败${fix_failed}个!`,
-            confirmButtonText: '确定',
-            showCloseButton: true,
-            showCancelButton: false,
-            allowOutsideClick: false,
-            html: (file_info_list.length == fix_failed) ? failed_info : ('<p>已生成可正常下载的新文件</p>' + (failed_info ? ('<p><br></p>' + failed_info) : '')),
-            onBeforeOpen: () => {
-                Add_content(document.createElement('div'));
-            }
-        }).then((result) => {
-            file_info_list = [];
-            require('system-core:system/baseService/message/message.js').trigger('system-refresh');
-        });
-    }
-
-    function fix_dl_precreate(file_id) {
-        if (file_id >= file_info_list.length) {
-            fix_dl_finish();
-            return;
-        } else if (file_info_list[file_id].errno) {
-            fix_dl_precreate(file_id + 1);
-            return;
-        }
-        var file_info = file_info_list[file_id];
-        $.ajax({
-            url: precreate_url,
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                block_list: JSON.stringify([file_info.md5]),
-                path: file_info.path,
-                size: file_info.size,
-                mode: 1,
-                isdir: 0,
-                autoinit: 1,
-            }
-        }).success(function (r) {
-            if (r.errno == 0) {
-                if (r.block_list.length) {
-                    file_info.errno = 888;
-                    fix_dl_precreate(file_id + 1);
-                } else if (r.uploadid) {
-                    file_info.uploadid = r.uploadid;
-                    fix_dl_create(file_id);
-                }
-            } else {
-                file_info.errno = 999;
-                fix_dl_precreate(file_id + 1);
-            }
-        }).fail(function (r) {
-            file_info.errno = 114;
-            fix_dl_precreate(file_id + 1);
-        });
-    }
-
-    function fix_dl_create(file_id) {
-        var file_info = file_info_list[file_id];
-        $.ajax({
-            url: create_url + bdstoken,
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                block_list: JSON.stringify([randomStringTransform(file_info.md5)]),
-                uploadid: file_info.uploadid,
-                path: file_info.path,
-                size: file_info.size,
-                mode: 1,
-                rtype: 2,
-                isdir: 0,
-                a: 'commit',
-                sequence: 1,
-                autoinit: 1
-            }
-        }).success(function (r) {
-            if (r.errno) {
-                file_info.errno = 888;
-            }
-        }).fail(function (r) {
-            file_info.errno = 114;
-        }).always(function () {
-            setTimeout(function () {
-                fix_dl_precreate(file_id + 1);
-            }, 2000);
-        });
-    }
 
     function initButtonEvent() {
         $(document).on('click', '#gen-bdlink-button', gen_bd_link_event);
-        $(document).on('click', '#fix-dl-button', fix_dl_event);
     }
 
     function getSelectedFileList() {
@@ -567,7 +375,7 @@
     function initButtonGen() {
         var listTools = getSystemContext().Broker.getButtonBroker('listTools');
         if (listTools && listTools.$box) {
-            $(listTools.$box).children('div').after(html_btn_gen + html_fix_dl);
+            $(listTools.$box).children('div').after(html_btn_gen);
             initButtonEvent();
         } else {
             setTimeout(initButtonGen, 500);
@@ -1036,28 +844,16 @@
         file_num.textContent = (i + 1).toString() + ' / ' + codeInfo.length.toString();
         switch (try_flag) {
             case 0:
-                if (fix_dl) {
-                    file.md5 = randomStringTransform(file.md5);
-                } else {
-                    file.md5 = file.md5.toUpperCase();
-                }
+                file.md5 = file.md5.toUpperCase();
                 break;
             case 1:
-                if (fix_dl) {
-                    file.md5 = file.md5.toUpperCase();
-                } else {
-                    file.md5 = file.md5.toLowerCase();
-                }
+                file.md5 = file.md5.toLowerCase();
                 break;
             case 2:
-                if (fix_dl) {
-                    file.md5 = file.md5.toLowerCase();
-                } else {
-                    file.md5 = randomStringTransform(file.md5);
-                }
+                file.md5 = randomStringTransform(file.md5);
         }
         $.ajax({
-            url: `/api/rapidupload${check_mode||fix_dl ? '?rtype=3' : ''}`,
+            url: `/api/rapidupload${check_mode ? '?rtype=3' : ''}`,
             type: 'POST',
             data: {
                 path: dir + file.path,
@@ -1134,9 +930,6 @@
             inputPlaceholder: '[支持PanDL/梦姬标准/游侠/PCS-Go][支持批量]\n[输入setting进入设置页]',
             confirmButtonText: '确定',
             cancelButtonText: '取消',
-            onBeforeOpen: () => {
-                Add_content2();
-            },
             inputValidator: (value) => {
                 if (!value) {
                     return '链接不能为空';
@@ -1148,7 +941,6 @@
                 if (!codeInfo.length) {
                     return '未识别到正确的链接';
                 }
-                fix_dl = document.getElementById('fix_dl_checkbox').checked;
             }
         }).then((result) => {
             if (!result.dismiss) {
@@ -1218,12 +1010,6 @@
             bdlink = bdlink[1].fromBase64();
         }
         return bdlink;
-    }
-
-    function Add_content2() {
-        var content = document.createElement('div')
-        content.innerHTML += fix_dl_checkbox;
-        Swal.getContent().appendChild(content);
     }
 
     function Add_content(content) {
@@ -1310,17 +1096,17 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.6.7_no_first')) {
+        if (!GM_getValue('1.6.8_no_first')) {
             Swal.fire({
-                title: `秒传链接提取 1.6.7 更新内容(21.3.30):`,
+                title: `秒传链接提取 1.6.8 更新内容(21.6.18):`,
                 html: update_info,
                 heightAuto: false,
                 scrollbarPadding: false,
                 showCloseButton: true,
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
-            }).then((result) => {
-                GM_setValue('1.6.7_no_first', true);
+            }).then(() => {
+                GM_setValue('1.6.8_no_first', true);
             });
         }
     };
@@ -1371,18 +1157,24 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>修复部分秒传转存时提示 "文件不存在(秒传无效)"</p>
+        <p>移除 <span style="color: red;">修复下载</span> 功能(已在21年4月上旬失效), 后续不会再考虑修复该功能</p>
 
         <p><br></p>
 
-        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/397324" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
+        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/428137" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
+
+        <p><br></p>
+
+        <p>1.6.7 更新内容(21.3.30)</p>
+
+        <p>修复部分秒传转存时提示 "文件不存在(秒传无效)"</p>
 
         <p><br></p>
 
         <p>1.6.1 更新内容(21.3.29)</p>
 
         <p>新增 <span style="color: red;">直接修复下载</span> 的功能, 选中网盘内文件, 再点击上方 <span style="color: red;">修复下载</span> 按钮即可生成可正常下载的新文件</p>
-        
+
         <img src="https://pic.rmb.bdstatic.com/bjh/5e05f7c1f772451b8efce938280bcaee.png"/>
 
         <p><br></p>
@@ -1400,15 +1192,15 @@
         <p>经测试, 原教程的 "固实压缩+加密文件名" 已无法再防和谐(在度盘移动端依旧可以在线解压), 目前有效的防和谐方法请参考教程内的 <span style="color: red;">"双层压缩"</span></p>
 
         <p><br></p>
-        
+
         <p>1.4.3 更新内容(21.2.6):</p>
 
         <p>修复了生成秒传时, 秒传有效, 仍提示"md5获取失败(#996)"的问题</p>
 
         <p><br></p>
-        
+
         <p>1.4.9 更新内容(21.1.28):</p>
-        
+
         <p>1. 重新兼容了暴力猴插件, 感谢Trendymen提供的代码</p>
 
         <p>2. 新增更换主题的功能, 在秒传输入框中输入setting进入设置页, 更换为其他主题, 即可避免弹窗时的背景变暗</p>
@@ -1450,9 +1242,9 @@
         <p><br></p>
 
         <p>1.2.9 更新内容(20.11.11):</p>
-        
+
         <p>生成秒传的弹窗添加了关闭按钮</p>
-        
+
         <p>删除了全部生成失败时的复制和测试按钮</p>
 
         <p>秒传生成后加了一个导出文件路径的选项(默认不导出)</p>
@@ -1462,31 +1254,31 @@
         <p><br></p>
 
         <p>1.2.5 更新内容(20.11.4):</p>
-        
+
         <p>优化按钮样式, 添加了md5获取失败的报错</p>
 
         <p>修复从pan.baidu.com进入后不显示生成按钮的问题</p>
-        
+
         <p><br></p>
-        
+
         <p>1.2.4 更新内容(20.11.2):</p>
-        
+
         <p>新增生成秒传:</p>
-        
+
         <p>选择文件或文件夹后点击 "生成秒传" 即可开始生成</p>
-        
+
         <p><br></p>
-        
+
         <p>继续未完成任务:</p>
-        
+
         <p>若生成秒传期间关闭了网页, 再次点击 "生成秒传" 即可继续任务</p>
-        
+
         <p><br></p>
-        
+
         <p>测试秒传功能:</p>
-        
+
         <p>生成完成后, 点击"测试"按钮, 会自动转存并覆盖文件(文件内容不变), 以检测秒传有效性, 以及修复md5错误防止秒传失效</p>
-        
+
         </span></div></div>`;
 
     myInit();
