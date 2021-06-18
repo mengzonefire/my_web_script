@@ -14,7 +14,7 @@
 
 支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：https://pan.baidu.com/#bdlink=[参数]，参数为base64加密过的任意格式链接 (支持批量)
 
-若喜欢该脚本可前往 [![](https://static.afdiancdn.com/static/img/logo/logo.png) 爱发电](https://afdian.net/@mengzonefire) 支持作者
+若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
 
 ## 常见秒传格式示例
 
