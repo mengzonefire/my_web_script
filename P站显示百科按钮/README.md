@@ -1,4 +1,4 @@
-爪机版pixiv的tag页面(`https://www.pixiv.net/tags/`)是有百科全书跳转按钮的
+爪机版pixiv的tag页面(`https://www.pixiv.net/tags/xxxxxx`)是有百科全书跳转按钮的
 
 但PC版页面却没有:-( ,安装这个脚本会给PC版页面也加上按钮
 
