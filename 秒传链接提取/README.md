@@ -98,6 +98,6 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 1. [PanDL格式]</span> 的链接可以在PandownDownLoad（Win版）生成，需要在度盘中存有文件
 
-2. [梦姬标准格式]请前往 [蓝奏云 密码:ab2f](https://wws.lanzous.com/b01u0yqvi) 获取生成工具，本地生成，但需要上传过文件到度盘才能使其生效
+2. [梦姬标准格式]请前往 [蓝奏云 密码:ab2f](https://wwe.lanzoui.com/b01u0yqvi) 获取生成工具，本地生成，但需要上传过文件到度盘才能使其生效
 
 3. 使用脚本自带的生成功能生成[梦姬标准格式]：选中文件/文件夹, 再点击 "生成秒传" 即可
