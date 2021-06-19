@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.0
+// @version         1.7.1
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -203,9 +203,14 @@
         gen_prog.textContent = `${parseInt((r.loaded / r.total) * 100)}%`;
     };
 
+    // 判断 Base64库加载是否成功
+    if (!window.Base64) {
+        alert('秒传链接提取:\n外部资源加载失败, 脚本无法运行, 请检查网络或尝试更换DNS');
+        return;
+    }
     if (Base64.extendString) {
         Base64.extendString();
-    }
+    } else { alert('秒传链接提取:\n外部资源加载错误, 脚本无法运行, 请尝试刷新页面'); }
 
     function randomStringTransform(string) {
         if (typeof string !== 'string') return false
@@ -862,7 +867,8 @@
                     interval_mode = false;
                     check_mode = false;
                 }
-                require('system-core:system/baseService/message/message.js').trigger('system-refresh');
+                if (new_flag) { location.reload(); }
+                else { require('system-core:system/baseService/message/message.js').trigger('system-refresh'); }
             });
             failed = 0;
             return;
