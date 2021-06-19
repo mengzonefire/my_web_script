@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.6.9
+// @version         1.7.0
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -22,7 +22,6 @@
 // @grant           GM_info
 // @grant           GM_getResourceText
 // @grant           GM_addStyle
-// @grant           GM_addElement
 // @run-at          document-start
 // @connect         *
 // ==/UserScript==
@@ -1168,9 +1167,11 @@
             bdlink ? GetInfo(bdlink) : showUpdateInfo();
             // 判断是否是新版页面
             if (document.getElementsByClassName('nd-main-layout').length) {
-                GM_addElement('script', {
-                    textContent: GM_getResourceText('jquery')
-                });
+                // 新版页面不自带jquery, 需要手动注入
+                let jq_script = document.createElement("script");
+                jq_script.type = "text/javascript";
+                jq_script.text = GM_getResourceText('jquery');
+                document.getElementsByTagName('head')[0].appendChild(jq_script);
                 new_flag = true;
             }
             get_bdstoken();

@@ -39,6 +39,9 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 ## 待更新
 1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
 2. 支持 新版度盘页面 下的 "生成秒传" 功能
+3. 修复设置为非默认主题时, 窗口内会出现警告标识的问题
+
+![](https://pic.rmb.bdstatic.com/bjh/f4fd5ba4109c5baa44dc6fada5f3e703.png)
 
 ## 更新历史
 
