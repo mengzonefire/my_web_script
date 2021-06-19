@@ -36,7 +36,15 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 3. 火狐firefox用户使用会员账号生成秒传时, 会报 "文件获取失败(#403)", 通过 [UA切换插件](https://addons.mozilla.org/zh-CN/firefox/addon/uaswitcher) 切换为Chrome的UA, 即可解决
 
+## 待更新
+1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
+2. 支持 新版度盘页面 下的 "生成秒传" 功能
+
 ## 更新历史
+
+21.6.18更新：转存秒传添加bdstoken参数, 防止报错"转存失败(#2)", 并支持了新版度盘页面下的转存功能:
+
+![](https://pic.rmb.bdstatic.com/bjh/ed9647f2c8d16a8a6fb74d42e51626cf.png)
 
 21.6.18更新：移除<span style="color: rgb(209, 72, 65);"> 修复下载 </span>功能(已在21年4月上旬失效), 后续不会再考虑修复该功能
 
