@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.6.8
+// @version         1.6.9
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
 // @contributionURL https://afdian.net/@mengzonefire
+// @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
+// @resource jquery         https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
 // @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css
 // @require         https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.js
 // @require         https://cdn.jsdelivr.net/npm/js-base64
@@ -20,6 +22,7 @@
 // @grant           GM_info
 // @grant           GM_getResourceText
 // @grant           GM_addStyle
+// @grant           GM_addElement
 // @run-at          document-start
 // @connect         *
 // ==/UserScript==
@@ -29,6 +32,7 @@
     const info_url = 'https://pan.baidu.com/rest/2.0/xpan/nas?method=uinfo';
     const api_url = 'http://pan.baidu.com/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
+    const bdstoken_url = 'https://pan.baidu.com/api/gettemplatevariable';
     const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
     //使用'250528', '265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
@@ -172,28 +176,32 @@
         interval = 0,
         check_mode = false,
         interval_mode = false,
+        new_flag = false,
         file_info_list = [],
         gen_success_list = [],
-        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list;
-    const myStyle = `style="width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;"`;
-    const myBtnStyle = `style="height: 26px;line-height: 26px;vertical-align: middle;"`;
+        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, bdstoken;
+    const myStyle = `style='width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;'`;
+    const myStyle2 = `style='color: #09AAFF;'`;
+    const myBtnStyle = `style='font-size: 15px;color: #09AAFF;border: 2px solid #C3EAFF;border-radius: 4px;padding: 10px;margin: 0 5px;padding-top: 5px;padding-bottom: 5px; cursor: pointer'`;
     const html_btn = `<a class="g-button g-button-blue" id="bdlink_btn" title="秒传链接" style="display: inline-block;"">
     <span class="g-button-right"><em class="icon icon-disk" title="秒传链接提取"></em><span class="text" style="width: auto;">秒传链接</span></span></a>`;
     const html_btn_gen = `<a class="g-button" id="gen-bdlink-button"><span class="g-button-right"><em class="icon icon-share"></em><span class="text" style="width: auto;">生成秒传</span></span></a>`;
-    const html_check_md5 = `<p ${myStyle}>测试秒传, 可防止秒传失效<a class="g-button g-button-blue" id="check_md5_btn" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">测试</span></span></a></p>`;
-    const html_document = `<p ${myStyle}>秒传无效/md5获取失败/防和谐 可参考<a class="g-button g-button-blue" ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">分享教程</span></span></a></p>`;
-    const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者
-    <a class="g-button" id="kill_donate" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></span></a></p>`;
-    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a href="https://greasyfork.org/zh-CN/scripts/397324" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
-    <a class="g-button" id="kill_feedback" ${myBtnStyle}><span class="g-button-right" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></span></a></p>`;
+    const html_check_md5 = `<p ${myStyle}>测试秒传, 可防止秒传失效<a id="check_md5_btn" ${myBtnStyle}><span class="text" style="width: auto;">测试</span></a></p>`;
+    const html_document = `<p ${myStyle}>秒传无效/md5获取失败/防和谐 可参考<a ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="text" style="width: auto;">分享教程</span></a></p>`;
+    const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a ${myStyle2} href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者
+    <a id="kill_donate" ${myBtnStyle}><span style="width: auto;">不再显示</span></a></p>`;
+    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/397324" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
+    <a id="kill_feedback" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></a></p>`;
     const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"总是允许"或"总是允许全部"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
+    const html_btn_new = '<a id="bdlink_btn" style="margin-left: 8px;" class="nd-upload-button upload-wrapper"><span class="nd-common-btn nd-file-list-toolbar-action-item u-btn u-btn--primary u-btn--medium u-btn--default is-has-icon"><i class="iconfont inline-block-v-middle icon-copy"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">秒传</span></span> </a>';
+    const html_btn_gen_new = '<button id="gen-bdlink-button" class="u-btn nd-common-btn nd-file-list-toolbar-action-item is-need-left-sep u-btn--normal u-btn--medium u-btn--default is-has-icon"> <span><i class="iconfont inline-block-v-middle nd-file-list-toolbar__action-item-icon icon-share"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">生成秒传</span></span> </button>';
     var checkbox_par = {
         input: 'checkbox',
         inputValue: GM_getValue('with_path'),
         inputPlaceholder: '导出文件夹目录结构',
     };
     var show_prog = function (r) {
-        gen_prog.textContent = `${parseInt((r.loaded/r.total)*100)}%`;
+        gen_prog.textContent = `${parseInt((r.loaded / r.total) * 100)}%`;
     };
 
     if (Base64.extendString) {
@@ -351,17 +359,28 @@
     };
 
     function initButtonHome() {
+        if (new_flag) {
+            var tag1 = 'div.nd-file-list-toolbar__actions';
+            var tag2 = 'a.nd-upload-button';
+            var my_html_btn = html_btn_new;
+        }
+        else {
+            var tag1 = 'div.tcuLAu';
+            var tag2 = '#h5Input0';
+            var my_html_btn = html_btn;
+        }
         let loop_count = 0;
         let loop = setInterval(() => {
-            var html_tag = $('div.tcuLAu');
+            let html_tag = $(tag1);
             if (!html_tag.length) return false;
             loop_count++;
             if (loop_count > 40) {
-                html_tag.append(html_btn);
-            } else if (!$('#h5Input0').length) return false;
-            else html_tag.append(html_btn);
+                html_tag.append(my_html_btn);
+            }
+            else if (!$(tag2).length) return false;
+            else html_tag.append(my_html_btn);
             let loop2 = setInterval(() => {
-                var btn_tag = $('#bdlink_btn');
+                let btn_tag = $('#bdlink_btn');
                 if (!btn_tag.length) return false;
                 btn_tag.click(function () {
                     GetInfo();
@@ -372,13 +391,22 @@
         }, 50);
     }
 
+    function initButtonGen_new() {
+
+    }
+
     function initButtonGen() {
-        var listTools = getSystemContext().Broker.getButtonBroker('listTools');
-        if (listTools && listTools.$box) {
-            $(listTools.$box).children('div').after(html_btn_gen);
-            initButtonEvent();
-        } else {
-            setTimeout(initButtonGen, 500);
+        if (new_flag) {
+
+        }
+        else {
+            var listTools = getSystemContext().Broker.getButtonBroker('listTools');
+            if (listTools && listTools.$box) {
+                $(listTools.$box).children('div').after(html_btn_gen);
+                initButtonEvent();
+            } else {
+                setTimeout(initButtonGen, 500);
+            }
         }
     };
 
@@ -677,7 +705,7 @@
         return Array.prototype.slice.call(this.buf, index, index + size).map(SimpleBuffer.toStdHex).join('');
     };
 
-    function DuParser() {}
+    function DuParser() { }
 
     DuParser.parse = function generalDuCodeParse(szUrl) {
         var r;
@@ -853,7 +881,7 @@
                 file.md5 = randomStringTransform(file.md5);
         }
         $.ajax({
-            url: `/api/rapidupload${check_mode ? '?rtype=3' : ''}`,
+            url: `/api/rapidupload?bdstoken=${bdstoken}${check_mode ? '&rtype=3' : ''}`,
             type: 'POST',
             data: {
                 path: dir + file.path,
@@ -896,10 +924,10 @@
                 return '转存失败(尝试重新登录网盘账号)';
             case 3939:
                 return `秒传不支持大于20G的文件,文件大小:${(file_size / (1024 ** 3)).toFixed(2)}G`;
-                //文件大于20G时访问秒传接口实际会返回#2
+            //文件大于20G时访问秒传接口实际会返回#2
             case 2333:
                 return '链接内的文件路径错误(不能含有以下字符"\\:*?<>|)';
-                //文件路径错误时接口实际也是返回#2
+            //文件路径错误时接口实际也是返回#2
             case -10:
                 return '网盘容量已满';
             case 114:
@@ -1060,6 +1088,28 @@
         GM_xmlhttpRequest(info_par);
     }
 
+    function get_bdstoken() {
+        $.ajax({
+            url: bdstoken_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                fields: JSON.stringify(["bdstoken"])
+            }
+        }).success(function (r) {
+            if (!r.errno) {
+                bdstoken = r.result.bdstoken;
+                initButtonHome();
+                initButtonGen();
+                checkVipType();
+            } else {
+                alert('获取bdstoken失败, 请尝试重新登录');
+            }
+        }).fail(function (r) {
+            alert('获取bdstoken失败, 请尝试刷新页面');
+        });
+    }
+
     const injectStyle = () => {
         GM_addStyle(css_checkbox);
         let style = GM_getResourceText('sweetalert2Css');
@@ -1116,9 +1166,14 @@
         const bdlink = GetInfo_url();
         window.addEventListener('DOMContentLoaded', () => {
             bdlink ? GetInfo(bdlink) : showUpdateInfo();
-            initButtonHome();
-            initButtonGen();
-            checkVipType();
+            // 判断是否是新版页面
+            if (document.getElementsByClassName('nd-main-layout').length) {
+                GM_addElement('script', {
+                    textContent: GM_getResourceText('jquery')
+                });
+                new_flag = true;
+            }
+            get_bdstoken();
         });
     }
 

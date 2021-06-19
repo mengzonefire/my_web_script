@@ -15,13 +15,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.6.8
+// @version         1.6.9
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
 // @contributionURL https://afdian.net/@mengzonefire
+// @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
+// @resource jquery         https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
 // @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css
 // @require         https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.js
 // @require         https://cdn.jsdelivr.net/npm/js-base64
@@ -34,6 +36,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // @grant           GM_info
 // @grant           GM_getResourceText
 // @grant           GM_addStyle
+// @grant           GM_addElement
 // @run-at          document-start
 // @connect         *
 // ==/UserScript==
@@ -44,6 +47,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   var info_url = 'https://pan.baidu.com/rest/2.0/xpan/nas?method=uinfo';
   var api_url = 'http://pan.baidu.com/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
   var pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
+  var bdstoken_url = 'https://pan.baidu.com/api/gettemplatevariable';
   var appid_list = ['266719', '265486', '250528', '778750', '498065', '309847']; //使用'250528', '265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403
 
   var bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
@@ -61,6 +65,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       interval = 0,
       check_mode = false,
       interval_mode = false,
+      new_flag = false,
       file_info_list = [],
       gen_success_list = [],
       dir,
@@ -71,16 +76,20 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       recursive,
       bdcode,
       xmlhttpRequest,
-      select_list;
-  var myStyle = "style=\"width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;\"";
-  var myBtnStyle = "style=\"height: 26px;line-height: 26px;vertical-align: middle;\"";
+      select_list,
+      bdstoken;
+  var myStyle = "style='width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;'";
+  var myStyle2 = "style='color: #09AAFF;'";
+  var myBtnStyle = "style='font-size: 15px;color: #09AAFF;border: 2px solid #C3EAFF;border-radius: 4px;padding: 10px;margin: 0 5px;padding-top: 5px;padding-bottom: 5px; cursor: pointer'";
   var html_btn = "<a class=\"g-button g-button-blue\" id=\"bdlink_btn\" title=\"\u79D2\u4F20\u94FE\u63A5\" style=\"display: inline-block;\"\">\n    <span class=\"g-button-right\"><em class=\"icon icon-disk\" title=\"\u79D2\u4F20\u94FE\u63A5\u63D0\u53D6\"></em><span class=\"text\" style=\"width: auto;\">\u79D2\u4F20\u94FE\u63A5</span></span></a>";
   var html_btn_gen = "<a class=\"g-button\" id=\"gen-bdlink-button\"><span class=\"g-button-right\"><em class=\"icon icon-share\"></em><span class=\"text\" style=\"width: auto;\">\u751F\u6210\u79D2\u4F20</span></span></a>";
-  var html_check_md5 = "<p ".concat(myStyle, ">\u6D4B\u8BD5\u79D2\u4F20, \u53EF\u9632\u6B62\u79D2\u4F20\u5931\u6548<a class=\"g-button g-button-blue\" id=\"check_md5_btn\" ").concat(myBtnStyle, "><span class=\"g-button-right\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u6D4B\u8BD5</span></span></a></p>");
-  var html_document = "<p ".concat(myStyle, ">\u79D2\u4F20\u65E0\u6548/md5\u83B7\u53D6\u5931\u8D25/\u9632\u548C\u8C10 \u53EF\u53C2\u8003<a class=\"g-button g-button-blue\" ").concat(myBtnStyle, " href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\"><span class=\"g-button-right\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u5206\u4EAB\u6559\u7A0B</span></span></a></p>");
-  var html_donate = "<p id=\"bdcode_donate\" ".concat(myStyle, ">\u82E5\u559C\u6B22\u8BE5\u811A\u672C, \u53EF\u524D\u5F80 <a href=\"https://afdian.net/@mengzonefire\" rel=\"noopener noreferrer\" target=\"_blank\">\u8D5E\u52A9\u9875</a> \u652F\u6301\u4F5C\u8005\n    <a class=\"g-button\" id=\"kill_donate\" ").concat(myBtnStyle, "><span class=\"g-button-right\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u4E0D\u518D\u663E\u793A</span></span></a></p>");
-  var html_feedback = "<p id=\"bdcode_feedback\" ".concat(myStyle, ">\u82E5\u6709\u4EFB\u4F55\u7591\u95EE, \u53EF\u524D\u5F80 <a href=\"https://greasyfork.org/zh-CN/scripts/397324\" rel=\"noopener noreferrer\" target=\"_blank\">\u811A\u672C\u9875</a> \u53CD\u9988\n    <a class=\"g-button\" id=\"kill_feedback\" ").concat(myBtnStyle, "><span class=\"g-button-right\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u4E0D\u518D\u663E\u793A</span></span></a></p>");
+  var html_check_md5 = "<p ".concat(myStyle, ">\u6D4B\u8BD5\u79D2\u4F20, \u53EF\u9632\u6B62\u79D2\u4F20\u5931\u6548<a id=\"check_md5_btn\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u6D4B\u8BD5</span></a></p>");
+  var html_document = "<p ".concat(myStyle, ">\u79D2\u4F20\u65E0\u6548/md5\u83B7\u53D6\u5931\u8D25/\u9632\u548C\u8C10 \u53EF\u53C2\u8003<a ").concat(myBtnStyle, " href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\"><span class=\"text\" style=\"width: auto;\">\u5206\u4EAB\u6559\u7A0B</span></a></p>");
+  var html_donate = "<p id=\"bdcode_donate\" ".concat(myStyle, ">\u82E5\u559C\u6B22\u8BE5\u811A\u672C, \u53EF\u524D\u5F80 <a ").concat(myStyle2, " href=\"https://afdian.net/@mengzonefire\" rel=\"noopener noreferrer\" target=\"_blank\">\u8D5E\u52A9\u9875</a> \u652F\u6301\u4F5C\u8005\n    <a id=\"kill_donate\" ").concat(myBtnStyle, "><span style=\"width: auto;\">\u4E0D\u518D\u663E\u793A</span></a></p>");
+  var html_feedback = "<p id=\"bdcode_feedback\" ".concat(myStyle, ">\u82E5\u6709\u4EFB\u4F55\u7591\u95EE, \u53EF\u524D\u5F80 <a ").concat(myStyle2, " href=\"https://greasyfork.org/zh-CN/scripts/397324\" rel=\"noopener noreferrer\" target=\"_blank\">\u811A\u672C\u9875</a> \u53CD\u9988\n    <a id=\"kill_feedback\" ").concat(myBtnStyle, "><span class=\"text\" style=\"width: auto;\">\u4E0D\u518D\u663E\u793A</span></a></p>");
   var csd_hint_html = '<p>弹出跨域访问窗口时,请选择"总是允许"或"总是允许全部"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
+  var html_btn_new = '<a id="bdlink_btn" style="margin-left: 8px;" class="nd-upload-button upload-wrapper"><span class="nd-common-btn nd-file-list-toolbar-action-item u-btn u-btn--primary u-btn--medium u-btn--default is-has-icon"><i class="iconfont inline-block-v-middle icon-copy"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">秒传</span></span> </a>';
+  var html_btn_gen_new = '<button id="gen-bdlink-button" class="u-btn nd-common-btn nd-file-list-toolbar-action-item is-need-left-sep u-btn--normal u-btn--medium u-btn--default is-has-icon"> <span><i class="iconfont inline-block-v-middle nd-file-list-toolbar__action-item-icon icon-share"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">生成秒传</span></span> </button>';
   var checkbox_par = {
     input: 'checkbox',
     inputValue: GM_getValue('with_path'),
@@ -263,15 +272,25 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   ;
 
   function initButtonHome() {
+    if (new_flag) {
+      var tag1 = 'div.nd-file-list-toolbar__actions';
+      var tag2 = 'a.nd-upload-button';
+      var my_html_btn = html_btn_new;
+    } else {
+      var tag1 = 'div.tcuLAu';
+      var tag2 = '#h5Input0';
+      var my_html_btn = html_btn;
+    }
+
     var loop_count = 0;
     var loop = setInterval(function () {
-      var html_tag = $('div.tcuLAu');
+      var html_tag = $(tag1);
       if (!html_tag.length) return false;
       loop_count++;
 
       if (loop_count > 40) {
-        html_tag.append(html_btn);
-      } else if (!$('#h5Input0').length) return false;else html_tag.append(html_btn);
+        html_tag.append(my_html_btn);
+      } else if (!$(tag2).length) return false;else html_tag.append(my_html_btn);
 
       var loop2 = setInterval(function () {
         var btn_tag = $('#bdlink_btn');
@@ -285,14 +304,18 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }, 50);
   }
 
-  function initButtonGen() {
-    var listTools = getSystemContext().Broker.getButtonBroker('listTools');
+  function initButtonGen_new() {}
 
-    if (listTools && listTools.$box) {
-      $(listTools.$box).children('div').after(html_btn_gen);
-      initButtonEvent();
-    } else {
-      setTimeout(initButtonGen, 500);
+  function initButtonGen() {
+    if (new_flag) {} else {
+      var listTools = getSystemContext().Broker.getButtonBroker('listTools');
+
+      if (listTools && listTools.$box) {
+        $(listTools.$box).children('div').after(html_btn_gen);
+        initButtonEvent();
+      } else {
+        setTimeout(initButtonGen, 500);
+      }
     }
   }
 
@@ -830,7 +853,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
 
     $.ajax({
-      url: "/api/rapidupload".concat(check_mode ? '?rtype=3' : ''),
+      url: "/api/rapidupload?bdstoken=".concat(bdstoken).concat(check_mode ? '&rtype=3' : ''),
       type: 'POST',
       data: {
         path: dir + file.path,
@@ -1072,6 +1095,28 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     GM_xmlhttpRequest(info_par);
   }
 
+  function get_bdstoken() {
+    $.ajax({
+      url: bdstoken_url,
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        fields: JSON.stringify(["bdstoken"])
+      }
+    }).success(function (r) {
+      if (!r.errno) {
+        bdstoken = r.result.bdstoken;
+        initButtonHome();
+        initButtonGen();
+        checkVipType();
+      } else {
+        alert('获取bdstoken失败, 请尝试重新登录');
+      }
+    }).fail(function (r) {
+      alert('获取bdstoken失败, 请尝试刷新页面');
+    });
+  }
+
   var injectStyle = function injectStyle() {
     GM_addStyle(css_checkbox);
     var style = GM_getResourceText('sweetalert2Css'); // 暴力猴直接粘贴脚本代码时可能不会将resource中的数据下载缓存，fallback到下载css代码
@@ -1132,10 +1177,16 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     injectStyle();
     var bdlink = GetInfo_url();
     window.addEventListener('DOMContentLoaded', function () {
-      bdlink ? GetInfo(bdlink) : showUpdateInfo();
-      initButtonHome();
-      initButtonGen();
-      checkVipType();
+      bdlink ? GetInfo(bdlink) : showUpdateInfo(); // 判断是否是新版页面
+
+      if (document.getElementsByClassName('nd-main-layout').length) {
+        GM_addElement('script', {
+          textContent: GM_getResourceText('jquery')
+        });
+        new_flag = true;
+      }
+
+      get_bdstoken();
     });
   }
 
