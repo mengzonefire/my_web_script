@@ -189,7 +189,7 @@
     const html_document = `<p ${myStyle}>秒传无效/md5获取失败/防和谐 可参考<a ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="text" style="width: auto;">分享教程</span></a></p>`;
     const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a ${myStyle2} href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者
     <a id="kill_donate" ${myBtnStyle}><span style="width: auto;">不再显示</span></a></p>`;
-    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/397324" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
+    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
     <a id="kill_feedback" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></a></p>`;
     const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"总是允许"或"总是允许全部"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
     const html_btn_new = '<a id="bdlink_btn" style="margin-left: 8px;" class="nd-upload-button upload-wrapper"><span class="nd-common-btn nd-file-list-toolbar-action-item u-btn u-btn--primary u-btn--medium u-btn--default is-has-icon"><i class="iconfont inline-block-v-middle icon-copy"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">秒传</span></span> </a>';
@@ -1223,7 +1223,7 @@
 
         <p><br></p>
 
-        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/428137" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
+        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
 
         <p><br></p>
 
