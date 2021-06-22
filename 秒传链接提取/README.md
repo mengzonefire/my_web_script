@@ -12,18 +12,14 @@
 
 ## 脚本说明
 
-使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.githubassets.com/favicons/favicon.png) GitHub](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
+* 使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.githubassets.com/favicons/favicon.png) GitHub](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
 
-<br/>
-
-支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：`https://pan.baidu.com/#bdlink=[参数]`，[参数]为base64加密过的任意格式链接 (支持批量)
+* 支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：`https://pan.baidu.com/#bdlink=[参数]`，[参数]为base64加密过的任意格式链接 (支持批量)
 
 PS: 1.7.0版本支持了新版度盘页面, 目前官方未强制跳转新版, 如果要通过一键秒传跳转新版, 则url格式为`https://pan.baidu.com/disk/main#bdlink=[参数]`
 
-<br/>
 
-
-若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
+* 若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
 
 ## 常见秒传格式示例
 
