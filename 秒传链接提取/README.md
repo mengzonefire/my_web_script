@@ -38,13 +38,13 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 ## 待更新
 1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
 2. 支持 新版度盘页面 下的 "生成秒传" 功能
-3. 修复设置为非默认主题时, 窗口内会出现警告标识的问题
-
-![](https://pic.rmb.bdstatic.com/bjh/f4fd5ba4109c5baa44dc6fada5f3e703.png)
+3. ~~修复设置为非默认主题时, 窗口内会出现警告标识的问题~~ (完成, 实际为主题包不适配旧版sweetalert2)
 
 ## 更新历史
 
-21.6.23更新：修复了生成秒传时报错<span style="color: red;">#403</span>的问题
+21.6.23更新：
+* 将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)
+* 尝试修复生成秒传报错<span style="color: red;">#403</span>
 
 21.6.18更新：转存秒传添加bdstoken参数, 防止报错"转存失败(#2)", 并支持了新版度盘页面下的转存功能:
 

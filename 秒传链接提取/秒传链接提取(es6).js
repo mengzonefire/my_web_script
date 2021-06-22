@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.2
+// @version         1.7.3
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -10,8 +10,8 @@
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
 // @resource jquery         https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
-// @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css
-// @require         https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.js
+// @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css
+// @require         https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js
 // @require         https://cdn.jsdelivr.net/npm/js-base64
 // @require         https://cdn.staticfile.org/spark-md5/3.0.0/spark-md5.min.js
 // @grant           GM_setValue
@@ -36,12 +36,12 @@
     //使用'250528', '265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
     const css_url = {
-        'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css',
-        'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css',
-        'WordPress Admin': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-wordpress-admin@4/wordpress-admin.css',
-        'Material UI': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui@4/material-ui.css',
-        'Bulma': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@4/bulma.css',
-        'Bootstrap 4': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@4/bootstrap-4.css'
+        'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
+        'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css',
+        'WordPress Admin': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-wordpress-admin@5/wordpress-admin.min.css',
+        'Material UI': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui@5/material-ui.min.css',
+        'Bulma': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5/bulma.min.css',
+        'Bootstrap 4': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.min.css'
     };
     const css_checkbox = `input[type='checkbox'],
     input[type='radio'] {
@@ -428,9 +428,9 @@
             showCloseButton: true,
             allowOutsideClick: false,
             html: '<p>正在生成第 <gen_num></gen_num> 个</p><p><gen_prog></gen_prog></p>',
-            onBeforeOpen: () => {
+            willOpen: () => {
                 Swal.showLoading()
-                var content = Swal.getContent();
+                var content = Swal.getHtmlContainer();
                 if (content) {
                     gen_num = content.querySelector('gen_num');
                     gen_prog = content.querySelector('gen_prog');
@@ -542,7 +542,7 @@
                 allowOutsideClick: false,
                 html: bdcode ? (html_check_md5 + html_document + (failed_info && ('<p><br></p>' + failed_info))) : html_document + '<p><br></p>' + failed_info,
                 ...(bdcode && checkbox_par),
-                onBeforeOpen: () => {
+                willOpen: () => {
                     let loop = setInterval(() => {
                         var html_tag = $('#check_md5_btn');
                         if (!html_tag.length) return false;
@@ -592,7 +592,7 @@
             type: 'GET',
             headers: {
                 'Range': `bytes=0-${dl_size}`,
-                'User-Agent': 'netdisk;8.2.0;android-android;4.4.4'
+                'User-Agent': 'softxm;netdisk'
             },
             responseType: 'arraybuffer',
             onprogress: show_prog,
@@ -630,7 +630,7 @@
                     }, interval_mode ? interval * 1000 : 1000);
                 } else {
                     console.log(`return #${r.status}, appid: ${appid_list[appid_id]}`);
-                    if (r.status == 403 && appid_id < (appid_list.length - 1)) {
+                    if (r.status === 403 && appid_id < (appid_list.length - 1)) {
                         myGenerater(file_id, appid_id + 1, true);
                     } else {
                         file_info.errno = r.status;
@@ -813,9 +813,10 @@
                 title: `${check_mode ? '测试' : '转存'}完毕 共${codeInfo.length}个 失败${failed}个!`,
                 confirmButtonText: check_mode ? '复制秒传代码' : '确定',
                 showCloseButton: true,
+                html: ' ',
                 ...(check_mode && checkbox_par),
-                onBeforeOpen: () => {
-                    var content = Swal.getContent();
+                willOpen: () => {
+                    var content = Swal.getHtmlContainer();
                     codeInfo.forEach(function (item) {
                         if (item.errno) {
                             var file_name = item.path;
@@ -950,6 +951,8 @@
                 return '该文件不支持修复';
             case 999:
                 return 'uploadid获取失败';
+            case 500:
+                return '服务器错误,请稍后再试';
             default:
                 return '未知错误';
         }
@@ -1027,9 +1030,9 @@
             title: `文件${check_mode ? '测试' : '提取'}中`,
             html: `正在${check_mode ? '测试' : '转存'}第 <file_num></file_num> 个`,
             allowOutsideClick: false,
-            onBeforeOpen: () => {
+            willOpen: () => {
                 Swal.showLoading()
-                var content = Swal.getContent();
+                var content = Swal.getHtmlContainer();
                 if (content) {
                     file_num = content.querySelector('file_num');
                     saveFile(0, 0);
@@ -1048,7 +1051,7 @@
 
     function Add_content(content) {
         var hasAdd = false;
-        if (!GM_getValue('kill_feedback_1.7.2')) {
+        if (!GM_getValue('kill_feedback_1.7.3')) {
             hasAdd = true;
             content.innerHTML += `<p><br></p>`;
             content.innerHTML += html_feedback;
@@ -1056,13 +1059,13 @@
                 var html_tag = $('#kill_feedback');
                 if (!html_tag.length) return false;
                 $('#kill_feedback').click(function () {
-                    GM_setValue('kill_feedback_1.7.2', true);
+                    GM_setValue('kill_feedback_1.7.3', true);
                     $('#bdcode_feedback').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        if (!GM_getValue('kill_donate_1.7.2')) {
+        if (!GM_getValue('kill_donate_1.7.3')) {
             if (!hasAdd) {
                 content.innerHTML += `<p><br></p>`;
             }
@@ -1071,13 +1074,13 @@
                 var html_tag = $('#kill_donate');
                 if (!html_tag.length) return false;
                 $('#kill_donate').click(function () {
-                    GM_setValue('kill_donate_1.7.2', true);
+                    GM_setValue('kill_donate_1.7.3', true);
                     $('#bdcode_donate').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        Swal.getContent().appendChild(content);
+        Swal.getHtmlContainer().appendChild(content);
     }
 
     function checkVipType() {
@@ -1152,9 +1155,9 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.7.2_no_first')) {
+        if (!GM_getValue('1.7.3_no_first')) {
             Swal.fire({
-                title: `秒传链接提取 1.7.2 更新内容(21.6.23):`,
+                title: `秒传链接提取 1.7.3 更新内容(21.6.23):`,
                 html: update_info,
                 heightAuto: false,
                 scrollbarPadding: false,
@@ -1162,7 +1165,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.7.2_no_first', true);
+                GM_setValue('1.7.3_no_first', true);
             });
         }
     };
@@ -1220,7 +1223,9 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>修复了生成秒传时报错<span style="color: red;">#403</span>的问题</p>
+        <p>升级样式&主题, 提升观感, 修复了设置内的主题适配</p>
+
+        <p>尝试修复生成秒传报错<span style="color: red;">#403</span>的问题</p>
 
         <p><br></p>
 

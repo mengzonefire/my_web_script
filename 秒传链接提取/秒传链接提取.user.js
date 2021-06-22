@@ -15,7 +15,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.2
+// @version         1.7.3
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -24,8 +24,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
 // @resource jquery         https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
-// @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css
-// @require         https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.js
+// @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css
+// @require         https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js
 // @require         https://cdn.jsdelivr.net/npm/js-base64
 // @require         https://cdn.staticfile.org/spark-md5/3.0.0/spark-md5.min.js
 // @grant           GM_setValue
@@ -51,12 +51,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
   var bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
   var css_url = {
-    'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@8/dist/sweetalert2.min.css',
-    'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css',
-    'WordPress Admin': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-wordpress-admin@4/wordpress-admin.css',
-    'Material UI': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui@4/material-ui.css',
-    'Bulma': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@4/bulma.css',
-    'Bootstrap 4': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@4/bootstrap-4.css'
+    'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
+    'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css',
+    'WordPress Admin': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-wordpress-admin@5/wordpress-admin.min.css',
+    'Material UI': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui@5/material-ui.min.css',
+    'Bulma': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5/bulma.min.css',
+    'Bootstrap 4': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.min.css'
   };
   var css_checkbox = "input[type='checkbox'],\n    input[type='radio'] {\n      --active: #275EFE;\n      --active-inner: #fff;\n      --focus: 2px rgba(39, 94, 254, .3);\n      --border: #BBC1E1;\n      --border-hover: #275EFE;\n      --background: #fff;\n      --disabled: #F6F8FF;\n      --disabled-inner: #E1E6F9;\n      -webkit-appearance: none;\n      -moz-appearance: none;\n      height: 21px;\n      outline: none;\n      display: inline-block;\n      vertical-align: top;\n      position: relative;\n      margin: 0;\n      cursor: pointer;\n      border: 1px solid var(--bc, var(--border));\n      background: var(--b, var(--background));\n      -webkit-transition: background .3s, border-color .3s, box-shadow .2s;\n      transition: background .3s, border-color .3s, box-shadow .2s;\n    }\n    input[type='checkbox']:after,\n    input[type='radio']:after {\n      content: '';\n      display: block;\n      left: 0;\n      top: 0;\n      position: absolute;\n      -webkit-transition: opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n      transition: opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n      transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s);\n      transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n    }\n    input[type='checkbox']:checked,\n    input[type='radio']:checked {\n      --b: var(--active);\n      --bc: var(--active);\n      --d-o: .3s;\n      --d-t: .6s;\n      --d-t-e: cubic-bezier(.2, .85, .32, 1.2);\n    }\n    input[type='checkbox']:disabled,\n    input[type='radio']:disabled {\n      --b: var(--disabled);\n      cursor: not-allowed;\n      opacity: .9;\n    }\n    input[type='checkbox']:disabled:checked,\n    input[type='radio']:disabled:checked {\n      --b: var(--disabled-inner);\n      --bc: var(--border);\n    }\n    input[type='checkbox']:disabled + label,\n    input[type='radio']:disabled + label {\n      cursor: not-allowed;\n    }\n    input[type='checkbox']:hover:not(:checked):not(:disabled),\n    input[type='radio']:hover:not(:checked):not(:disabled) {\n      --bc: var(--border-hover);\n    }\n    input[type='checkbox']:focus,\n    input[type='radio']:focus {\n      box-shadow: 0 0 0 var(--focus);\n    }\n    input[type='checkbox']:not(.switch),\n    input[type='radio']:not(.switch) {\n      width: 21px;\n    }\n    input[type='checkbox']:not(.switch):after,\n    input[type='radio']:not(.switch):after {\n      opacity: var(--o, 0);\n    }\n    input[type='checkbox']:not(.switch):checked,\n    input[type='radio']:not(.switch):checked {\n      --o: 1;\n    }\n    input[type='checkbox'] + label,\n    input[type='radio'] + label {\n      font-size: 18px;\n      line-height: 21px;\n      display: inline-block;\n      vertical-align: top;\n      cursor: pointer;\n      margin-left: 4px;\n    }\n\n    input[type='checkbox']:not(.switch) {\n      border-radius: 7px;\n    }\n    input[type='checkbox']:not(.switch):after {\n      width: 5px;\n      height: 9px;\n      border: 2px solid var(--active-inner);\n      border-top: 0;\n      border-left: 0;\n      left: 7px;\n      top: 4px;\n      -webkit-transform: rotate(var(--r, 20deg));\n              transform: rotate(var(--r, 20deg));\n    }\n    input[type='checkbox']:not(.switch):checked {\n      --r: 43deg;\n    }\n    input[type='checkbox'].switch {\n      width: 38px;\n      border-radius: 11px;\n    }\n    input[type='checkbox'].switch:after {\n      left: 2px;\n      top: 2px;\n      border-radius: 50%;\n      width: 15px;\n      height: 15px;\n      background: var(--ab, var(--border));\n      -webkit-transform: translateX(var(--x, 0));\n              transform: translateX(var(--x, 0));\n    }\n    input[type='checkbox'].switch:checked {\n      --ab: var(--active-inner);\n      --x: 17px;\n    }\n    input[type='checkbox'].switch:disabled:not(:checked):after {\n      opacity: .6;\n    }";
   var failed = 0,
@@ -347,9 +347,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       showCloseButton: true,
       allowOutsideClick: false,
       html: '<p>正在生成第 <gen_num></gen_num> 个</p><p><gen_prog></gen_prog></p>',
-      onBeforeOpen: function onBeforeOpen() {
+      willOpen: function willOpen() {
         Swal.showLoading();
-        var content = Swal.getContent();
+        var content = Swal.getHtmlContainer();
 
         if (content) {
           gen_num = content.querySelector('gen_num');
@@ -470,7 +470,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         allowOutsideClick: false,
         html: bdcode ? html_check_md5 + html_document + (failed_info && '<p><br></p>' + failed_info) : html_document + '<p><br></p>' + failed_info
       }, bdcode && checkbox_par), {}, {
-        onBeforeOpen: function onBeforeOpen() {
+        willOpen: function willOpen() {
           var loop = setInterval(function () {
             var html_tag = $('#check_md5_btn');
             if (!html_tag.length) return false;
@@ -527,7 +527,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       type: 'GET',
       headers: {
         'Range': "bytes=0-".concat(dl_size),
-        'User-Agent': 'netdisk;8.2.0;android-android;4.4.4'
+        'User-Agent': 'softxm;netdisk'
       },
       responseType: 'arraybuffer',
       onprogress: show_prog,
@@ -569,7 +569,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         } else {
           console.log("return #".concat(r.status, ", appid: ").concat(appid_list[appid_id]));
 
-          if (r.status == 403 && appid_id < appid_list.length - 1) {
+          if (r.status === 403 && appid_id < appid_list.length - 1) {
             myGenerater(file_id, appid_id + 1, true);
           } else {
             file_info.errno = r.status;
@@ -772,10 +772,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       Swal.fire(_objectSpread(_objectSpread({
         title: "".concat(check_mode ? '测试' : '转存', "\u5B8C\u6BD5 \u5171").concat(codeInfo.length, "\u4E2A \u5931\u8D25").concat(failed, "\u4E2A!"),
         confirmButtonText: check_mode ? '复制秒传代码' : '确定',
-        showCloseButton: true
+        showCloseButton: true,
+        html: ' '
       }, check_mode && checkbox_par), {}, {
-        onBeforeOpen: function onBeforeOpen() {
-          var content = Swal.getContent();
+        willOpen: function willOpen() {
+          var content = Swal.getHtmlContainer();
           codeInfo.forEach(function (item) {
             if (item.errno) {
               var file_name = item.path;
@@ -916,7 +917,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         return '转存失败(尝试重新登录网盘账号)';
 
       case 3939:
-        return "\u79D2\u4F20\u4E0D\u652F\u6301\u5927\u4E8E20G\u7684\u6587\u4EF6,\u6587\u4EF6\u5927\u5C0F:".concat((file_size / Math.pow(1024, 3)).toFixed(2), "G");
+        return "\u79D2\u4F20\u4E0D\u652F\u630120G\u4EE5\u4E0A\u7684\u6587\u4EF6,\u6587\u4EF6\u5927\u5C0F:".concat((file_size / Math.pow(1024, 3)).toFixed(2), "G");
       //文件大于20G时访问秒传接口实际会返回#2
 
       case 2333:
@@ -946,6 +947,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
       case 999:
         return 'uploadid获取失败';
+
+      case 500:
+        return '服务器错误,请稍后再试';
 
       default:
         return '未知错误';
@@ -1032,9 +1036,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       title: "\u6587\u4EF6".concat(check_mode ? '测试' : '提取', "\u4E2D"),
       html: "\u6B63\u5728".concat(check_mode ? '测试' : '转存', "\u7B2C <file_num></file_num> \u4E2A"),
       allowOutsideClick: false,
-      onBeforeOpen: function onBeforeOpen() {
+      willOpen: function willOpen() {
         Swal.showLoading();
-        var content = Swal.getContent();
+        var content = Swal.getHtmlContainer();
 
         if (content) {
           file_num = content.querySelector('file_num');
@@ -1057,7 +1061,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   function Add_content(content) {
     var hasAdd = false;
 
-    if (!GM_getValue('kill_feedback_1.7.2')) {
+    if (!GM_getValue('kill_feedback_1.7.3')) {
       hasAdd = true;
       content.innerHTML += "<p><br></p>";
       content.innerHTML += html_feedback;
@@ -1065,14 +1069,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         var html_tag = $('#kill_feedback');
         if (!html_tag.length) return false;
         $('#kill_feedback').click(function () {
-          GM_setValue('kill_feedback_1.7.2', true);
+          GM_setValue('kill_feedback_1.7.3', true);
           $('#bdcode_feedback').remove();
         });
         clearInterval(loop);
       }, 50);
     }
 
-    if (!GM_getValue('kill_donate_1.7.2')) {
+    if (!GM_getValue('kill_donate_1.7.3')) {
       if (!hasAdd) {
         content.innerHTML += "<p><br></p>";
       }
@@ -1083,14 +1087,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         var html_tag = $('#kill_donate');
         if (!html_tag.length) return false;
         $('#kill_donate').click(function () {
-          GM_setValue('kill_donate_1.7.2', true);
+          GM_setValue('kill_donate_1.7.3', true);
           $('#bdcode_donate').remove();
         });
         clearInterval(_loop);
       }, 50);
     }
 
-    Swal.getContent().appendChild(content);
+    Swal.getHtmlContainer().appendChild(content);
   }
 
   function checkVipType() {
@@ -1170,9 +1174,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   };
 
   var showUpdateInfo = function showUpdateInfo() {
-    if (!GM_getValue('1.7.2_no_first')) {
+    if (!GM_getValue('1.7.3_no_first')) {
       Swal.fire({
-        title: "\u79D2\u4F20\u94FE\u63A5\u63D0\u53D6 1.7.2 \u66F4\u65B0\u5185\u5BB9(21.6.23):",
+        title: "\u79D2\u4F20\u94FE\u63A5\u63D0\u53D6 1.7.3 \u66F4\u65B0\u5185\u5BB9(21.6.23):",
         html: update_info,
         heightAuto: false,
         scrollbarPadding: false,
@@ -1180,7 +1184,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         allowOutsideClick: false,
         confirmButtonText: '确定'
       }).then(function () {
-        GM_setValue('1.7.2_no_first', true);
+        GM_setValue('1.7.3_no_first', true);
       });
     }
   };
@@ -1235,6 +1239,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     });
   }
 
-  var update_info = "<div class=\"panel-body\" style=\"height: 250px; overflow-y:scroll\">\n        <div style=\"border: 1px  #000000; width: 100%; margin: 0 auto;\"><span>\n\n        <p>\u4FEE\u590D\u4E86\u751F\u6210\u79D2\u4F20\u65F6\u62A5\u9519<span style=\"color: red;\">#403</span>\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>\u82E5\u51FA\u73B0\u4EFB\u4F55\u95EE\u9898\u8BF7\u524D\u5F80<a href=\"https://greasyfork.org/zh-CN/scripts/424574\" rel=\"noopener noreferrer\" target=\"_blank\">greasyfork\u9875</a>\u53CD\u9988</p>\n\n        <p><br></p>\n\n        <p>1.6.8 \u66F4\u65B0\u5185\u5BB9(21.6.18)</p>\n\n        <p><br></p>\n\n        <p>\u79FB\u9664 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u529F\u80FD(\u5DF2\u572821\u5E744\u6708\u4E0A\u65EC\u5931\u6548), \u540E\u7EED\u4E0D\u4F1A\u518D\u8003\u8651\u4FEE\u590D\u8BE5\u529F\u80FD</p>\n\n        <p><br></p>\n\n        <p>1.6.7 \u66F4\u65B0\u5185\u5BB9(21.3.30)</p>\n\n        <p>\u4FEE\u590D\u90E8\u5206\u79D2\u4F20\u8F6C\u5B58\u65F6\u63D0\u793A \"\u6587\u4EF6\u4E0D\u5B58\u5728(\u79D2\u4F20\u65E0\u6548)\"</p>\n\n        <p><br></p>\n\n        <p>1.6.1 \u66F4\u65B0\u5185\u5BB9(21.3.29)</p>\n\n        <p>\u65B0\u589E <span style=\"color: red;\">\u76F4\u63A5\u4FEE\u590D\u4E0B\u8F7D</span> \u7684\u529F\u80FD, \u9009\u4E2D\u7F51\u76D8\u5185\u6587\u4EF6, \u518D\u70B9\u51FB\u4E0A\u65B9 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u6309\u94AE\u5373\u53EF\u751F\u6210\u53EF\u6B63\u5E38\u4E0B\u8F7D\u7684\u65B0\u6587\u4EF6</p>\n\n        <img src=\"https://pic.rmb.bdstatic.com/bjh/5e05f7c1f772451b8efce938280bcaee.png\"/>\n\n        <p><br></p>\n\n        <p>1.5.7 \u66F4\u65B0\u5185\u5BB9(21.3.9)</p>\n\n        <p>\u4FEE\u590D\u90E8\u5206\u6587\u4EF6\u8F6C\u5B58\u540E <span style=\"color: red;\">\u65E0\u6CD5\u4E0B\u8F7D</span> \u7684\u95EE\u9898, \u53EF\u5C1D\u8BD5 <span style=\"color: red;\">\u91CD\u65B0\u8F6C\u5B58</span> \u4E4B\u524D\u65E0\u6CD5\u4E0B\u8F7D\u6587\u4EF6. \u4E14\u8F6C\u5B58\u65B0\u589E\u4E86 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u529F\u80FD</p>\n\n        <p><br></p>\n\n        <p>1.5.4 \u66F4\u65B0\u5185\u5BB9(21.2.11)</p>\n\n        <p>\u9762\u5411\u5206\u4EAB\u8005\u7684 <a href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\">\u5206\u4EAB\u6559\u7A0B</a> \u7684\u9632\u548C\u8C10\u65B9\u6CD5\u66F4\u65B0:</p>\n\n        <p>\u7ECF\u6D4B\u8BD5, \u539F\u6559\u7A0B\u7684 \"\u56FA\u5B9E\u538B\u7F29+\u52A0\u5BC6\u6587\u4EF6\u540D\" \u5DF2\u65E0\u6CD5\u518D\u9632\u548C\u8C10(\u5728\u5EA6\u76D8\u79FB\u52A8\u7AEF\u4F9D\u65E7\u53EF\u4EE5\u5728\u7EBF\u89E3\u538B), \u76EE\u524D\u6709\u6548\u7684\u9632\u548C\u8C10\u65B9\u6CD5\u8BF7\u53C2\u8003\u6559\u7A0B\u5185\u7684 <span style=\"color: red;\">\"\u53CC\u5C42\u538B\u7F29\"</span></p>\n\n        <p><br></p>\n\n        <p>1.4.3 \u66F4\u65B0\u5185\u5BB9(21.2.6):</p>\n\n        <p>\u4FEE\u590D\u4E86\u751F\u6210\u79D2\u4F20\u65F6, \u79D2\u4F20\u6709\u6548, \u4ECD\u63D0\u793A\"md5\u83B7\u53D6\u5931\u8D25(#996)\"\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.4.9 \u66F4\u65B0\u5185\u5BB9(21.1.28):</p>\n\n        <p>1. \u91CD\u65B0\u517C\u5BB9\u4E86\u66B4\u529B\u7334\u63D2\u4EF6, \u611F\u8C22Trendymen\u63D0\u4F9B\u7684\u4EE3\u7801</p>\n\n        <p>2. \u65B0\u589E\u66F4\u6362\u4E3B\u9898\u7684\u529F\u80FD, \u5728\u79D2\u4F20\u8F93\u5165\u6846\u4E2D\u8F93\u5165setting\u8FDB\u5165\u8BBE\u7F6E\u9875, \u66F4\u6362\u4E3A\u5176\u4ED6\u4E3B\u9898, \u5373\u53EF\u907F\u514D\u5F39\u7A97\u65F6\u7684\u80CC\u666F\u53D8\u6697</p>\n\n        <p>3. \u4FEE\u6539\u4E86\u90E8\u5206\u4EE3\u7801\u903B\u8F91, \u79D2\u4F20\u6309\u94AE\u4E0D\u4F1A\u518D\u51FA\u73B0\u5728\u6700\u5DE6\u8FB9\u4E86</p>\n\n        <p><br></p>\n\n        <p>1.4.6 \u66F4\u65B0\u5185\u5BB9(21.1.14):</p>\n\n        <p>\u672C\u6B21\u66F4\u65B0\u9488\u5BF9\u751F\u6210\u529F\u80FD\u505A\u4E86\u4F18\u5316:</p>\n\n        <p>1. \u4F7F\u7528\u8D85\u4F1A\u8D26\u53F7\u8FDB\u884C10\u4E2A\u4EE5\u4E0A\u7684\u6279\u91CF\u79D2\u4F20\u751F\u6210\u65F6, \u4F1A\u5F39\u7A97\u63D0\u793A\u8BBE\u7F6E\u751F\u6210\u95F4\u9694, \u9632\u6B62\u751F\u6210\u8FC7\u5FEB\u5BFC\u81F4\u63A5\u53E3\u88AB\u9650\u5236(#403)</p>\n\n        <p>2. \u4E3A\u79D2\u4F20\u5206\u4EAB\u8005\u63D0\u4F9B\u4E86\u4E00\u4EFD<a href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\">\u5206\u4EAB\u6559\u7A0B</a>\u7528\u4E8E\u53C2\u8003</p>\n\n        <p><br></p>\n\n        <p>1.4.5 \u66F4\u65B0\u5185\u5BB9(21.1.12):</p>\n\n        <p>\u4FEE\u590D\u4E861.4.0\u540E\u53EF\u80FD\u51FA\u73B0\u7684\u79D2\u4F20\u6309\u94AE\u65E0\u6548\u3001\u663E\u793A\u591A\u4E2A\u79D2\u4F20\u6309\u94AE\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.3.7 \u66F4\u65B0\u5185\u5BB9(21.1.3):</p>\n\n        <p>\u4FEE\u590D\u4E86\u4F1A\u5458\u8D26\u53F7\u751F\u621050M\u4EE5\u4E0B\u6587\u4EF6\u65F6\u63D0\u793A \"md5\u83B7\u53D6\u5931\u8D25\" \u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.3.3 \u66F4\u65B0\u5185\u5BB9(20.12.1):</p>\n\n        <p>\u79D2\u4F20\u751F\u6210\u5B8C\u6210\u540E\u70B9\u51FB\u590D\u5236\u6309\u94AE\u4E4B\u524D\u90FD\u53EF\u4EE5\u7EE7\u7EED\u4EFB\u52A1,\u9632\u6B62\u8BEF\u64CD\u4F5C\u5173\u95ED\u9875\u9762\u5BFC\u81F4\u751F\u6210\u7ED3\u679C\u4E22\u5931</p>\n\n        <p>\u4FEE\u6539\u4EE3\u7801\u6267\u884C\u987A\u5E8F\u9632\u6B62\u79D2\u4F20\u6309\u94AE\u51FA\u73B0\u5728\u6700\u5DE6\u7AEF</p>\n\n        <p>\u4FEE\u590D\u4E86\u8DE8\u57DF\u63D0\u793A\u4E2D\u5931\u6548\u7684\u8BF4\u660E\u56FE\u7247</p>\n\n        <p><br></p>\n\n        <p>1.2.9 \u66F4\u65B0\u5185\u5BB9(20.11.11):</p>\n\n        <p>\u751F\u6210\u79D2\u4F20\u7684\u5F39\u7A97\u6DFB\u52A0\u4E86\u5173\u95ED\u6309\u94AE</p>\n\n        <p>\u5220\u9664\u4E86\u5168\u90E8\u751F\u6210\u5931\u8D25\u65F6\u7684\u590D\u5236\u548C\u6D4B\u8BD5\u6309\u94AE</p>\n\n        <p>\u79D2\u4F20\u751F\u6210\u540E\u52A0\u4E86\u4E00\u4E2A\u5BFC\u51FA\u6587\u4EF6\u8DEF\u5F84\u7684\u9009\u9879(\u9ED8\u8BA4\u4E0D\u5BFC\u51FA)</p>\n\n        <p>\u5728\u8F93\u5165\u4FDD\u5B58\u8DEF\u5F84\u7684\u5F39\u7A97\u6DFB\u52A0\u4E86\u6821\u9A8C, \u9632\u6B62\u8F93\u5165\u9519\u8BEF\u8DEF\u5F84</p>\n\n        <p><br></p>\n\n        <p>1.2.5 \u66F4\u65B0\u5185\u5BB9(20.11.4):</p>\n\n        <p>\u4F18\u5316\u6309\u94AE\u6837\u5F0F, \u6DFB\u52A0\u4E86md5\u83B7\u53D6\u5931\u8D25\u7684\u62A5\u9519</p>\n\n        <p>\u4FEE\u590D\u4ECEpan.baidu.com\u8FDB\u5165\u540E\u4E0D\u663E\u793A\u751F\u6210\u6309\u94AE\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.2.4 \u66F4\u65B0\u5185\u5BB9(20.11.2):</p>\n\n        <p>\u65B0\u589E\u751F\u6210\u79D2\u4F20:</p>\n\n        <p>\u9009\u62E9\u6587\u4EF6\u6216\u6587\u4EF6\u5939\u540E\u70B9\u51FB \"\u751F\u6210\u79D2\u4F20\" \u5373\u53EF\u5F00\u59CB\u751F\u6210</p>\n\n        <p><br></p>\n\n        <p>\u7EE7\u7EED\u672A\u5B8C\u6210\u4EFB\u52A1:</p>\n\n        <p>\u82E5\u751F\u6210\u79D2\u4F20\u671F\u95F4\u5173\u95ED\u4E86\u7F51\u9875, \u518D\u6B21\u70B9\u51FB \"\u751F\u6210\u79D2\u4F20\" \u5373\u53EF\u7EE7\u7EED\u4EFB\u52A1</p>\n\n        <p><br></p>\n\n        <p>\u6D4B\u8BD5\u79D2\u4F20\u529F\u80FD:</p>\n\n        <p>\u751F\u6210\u5B8C\u6210\u540E, \u70B9\u51FB\"\u6D4B\u8BD5\"\u6309\u94AE, \u4F1A\u81EA\u52A8\u8F6C\u5B58\u5E76\u8986\u76D6\u6587\u4EF6(\u6587\u4EF6\u5185\u5BB9\u4E0D\u53D8), \u4EE5\u68C0\u6D4B\u79D2\u4F20\u6709\u6548\u6027, \u4EE5\u53CA\u4FEE\u590Dmd5\u9519\u8BEF\u9632\u6B62\u79D2\u4F20\u5931\u6548</p>\n\n        </span></div></div>";
+  var update_info = "<div class=\"panel-body\" style=\"height: 250px; overflow-y:scroll\">\n        <div style=\"border: 1px  #000000; width: 100%; margin: 0 auto;\"><span>\n\n        <p>\u5347\u7EA7\u6837\u5F0F&\u4E3B\u9898, \u63D0\u5347\u89C2\u611F, \u4FEE\u590D\u4E86\u8BBE\u7F6E\u5185\u7684\u4E3B\u9898\u9002\u914D</p>\n\n        <p>\u5C1D\u8BD5\u4FEE\u590D\u751F\u6210\u79D2\u4F20\u62A5\u9519<span style=\"color: red;\">#403</span>\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>\u82E5\u51FA\u73B0\u4EFB\u4F55\u95EE\u9898\u8BF7\u524D\u5F80<a href=\"https://greasyfork.org/zh-CN/scripts/424574\" rel=\"noopener noreferrer\" target=\"_blank\">greasyfork\u9875</a>\u53CD\u9988</p>\n\n        <p><br></p>\n\n        <p>1.6.8 \u66F4\u65B0\u5185\u5BB9(21.6.18)</p>\n\n        <p><br></p>\n\n        <p>\u79FB\u9664 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u529F\u80FD(\u5DF2\u572821\u5E744\u6708\u4E0A\u65EC\u5931\u6548), \u540E\u7EED\u4E0D\u4F1A\u518D\u8003\u8651\u4FEE\u590D\u8BE5\u529F\u80FD</p>\n\n        <p><br></p>\n\n        <p>1.6.7 \u66F4\u65B0\u5185\u5BB9(21.3.30)</p>\n\n        <p>\u4FEE\u590D\u90E8\u5206\u79D2\u4F20\u8F6C\u5B58\u65F6\u63D0\u793A \"\u6587\u4EF6\u4E0D\u5B58\u5728(\u79D2\u4F20\u65E0\u6548)\"</p>\n\n        <p><br></p>\n\n        <p>1.6.1 \u66F4\u65B0\u5185\u5BB9(21.3.29)</p>\n\n        <p>\u65B0\u589E <span style=\"color: red;\">\u76F4\u63A5\u4FEE\u590D\u4E0B\u8F7D</span> \u7684\u529F\u80FD, \u9009\u4E2D\u7F51\u76D8\u5185\u6587\u4EF6, \u518D\u70B9\u51FB\u4E0A\u65B9 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u6309\u94AE\u5373\u53EF\u751F\u6210\u53EF\u6B63\u5E38\u4E0B\u8F7D\u7684\u65B0\u6587\u4EF6</p>\n\n        <img src=\"https://pic.rmb.bdstatic.com/bjh/5e05f7c1f772451b8efce938280bcaee.png\"/>\n\n        <p><br></p>\n\n        <p>1.5.7 \u66F4\u65B0\u5185\u5BB9(21.3.9)</p>\n\n        <p>\u4FEE\u590D\u90E8\u5206\u6587\u4EF6\u8F6C\u5B58\u540E <span style=\"color: red;\">\u65E0\u6CD5\u4E0B\u8F7D</span> \u7684\u95EE\u9898, \u53EF\u5C1D\u8BD5 <span style=\"color: red;\">\u91CD\u65B0\u8F6C\u5B58</span> \u4E4B\u524D\u65E0\u6CD5\u4E0B\u8F7D\u6587\u4EF6. \u4E14\u8F6C\u5B58\u65B0\u589E\u4E86 <span style=\"color: red;\">\u4FEE\u590D\u4E0B\u8F7D</span> \u529F\u80FD</p>\n\n        <p><br></p>\n\n        <p>1.5.4 \u66F4\u65B0\u5185\u5BB9(21.2.11)</p>\n\n        <p>\u9762\u5411\u5206\u4EAB\u8005\u7684 <a href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\">\u5206\u4EAB\u6559\u7A0B</a> \u7684\u9632\u548C\u8C10\u65B9\u6CD5\u66F4\u65B0:</p>\n\n        <p>\u7ECF\u6D4B\u8BD5, \u539F\u6559\u7A0B\u7684 \"\u56FA\u5B9E\u538B\u7F29+\u52A0\u5BC6\u6587\u4EF6\u540D\" \u5DF2\u65E0\u6CD5\u518D\u9632\u548C\u8C10(\u5728\u5EA6\u76D8\u79FB\u52A8\u7AEF\u4F9D\u65E7\u53EF\u4EE5\u5728\u7EBF\u89E3\u538B), \u76EE\u524D\u6709\u6548\u7684\u9632\u548C\u8C10\u65B9\u6CD5\u8BF7\u53C2\u8003\u6559\u7A0B\u5185\u7684 <span style=\"color: red;\">\"\u53CC\u5C42\u538B\u7F29\"</span></p>\n\n        <p><br></p>\n\n        <p>1.4.3 \u66F4\u65B0\u5185\u5BB9(21.2.6):</p>\n\n        <p>\u4FEE\u590D\u4E86\u751F\u6210\u79D2\u4F20\u65F6, \u79D2\u4F20\u6709\u6548, \u4ECD\u63D0\u793A\"md5\u83B7\u53D6\u5931\u8D25(#996)\"\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.4.9 \u66F4\u65B0\u5185\u5BB9(21.1.28):</p>\n\n        <p>1. \u91CD\u65B0\u517C\u5BB9\u4E86\u66B4\u529B\u7334\u63D2\u4EF6, \u611F\u8C22Trendymen\u63D0\u4F9B\u7684\u4EE3\u7801</p>\n\n        <p>2. \u65B0\u589E\u66F4\u6362\u4E3B\u9898\u7684\u529F\u80FD, \u5728\u79D2\u4F20\u8F93\u5165\u6846\u4E2D\u8F93\u5165setting\u8FDB\u5165\u8BBE\u7F6E\u9875, \u66F4\u6362\u4E3A\u5176\u4ED6\u4E3B\u9898, \u5373\u53EF\u907F\u514D\u5F39\u7A97\u65F6\u7684\u80CC\u666F\u53D8\u6697</p>\n\n        <p>3. \u4FEE\u6539\u4E86\u90E8\u5206\u4EE3\u7801\u903B\u8F91, \u79D2\u4F20\u6309\u94AE\u4E0D\u4F1A\u518D\u51FA\u73B0\u5728\u6700\u5DE6\u8FB9\u4E86</p>\n\n        <p><br></p>\n\n        <p>1.4.6 \u66F4\u65B0\u5185\u5BB9(21.1.14):</p>\n\n        <p>\u672C\u6B21\u66F4\u65B0\u9488\u5BF9\u751F\u6210\u529F\u80FD\u505A\u4E86\u4F18\u5316:</p>\n\n        <p>1. \u4F7F\u7528\u8D85\u4F1A\u8D26\u53F7\u8FDB\u884C10\u4E2A\u4EE5\u4E0A\u7684\u6279\u91CF\u79D2\u4F20\u751F\u6210\u65F6, \u4F1A\u5F39\u7A97\u63D0\u793A\u8BBE\u7F6E\u751F\u6210\u95F4\u9694, \u9632\u6B62\u751F\u6210\u8FC7\u5FEB\u5BFC\u81F4\u63A5\u53E3\u88AB\u9650\u5236(#403)</p>\n\n        <p>2. \u4E3A\u79D2\u4F20\u5206\u4EAB\u8005\u63D0\u4F9B\u4E86\u4E00\u4EFD<a href=\"https://shimo.im/docs/TZ1JJuEjOM0wnFDH\" rel=\"noopener noreferrer\" target=\"_blank\">\u5206\u4EAB\u6559\u7A0B</a>\u7528\u4E8E\u53C2\u8003</p>\n\n        <p><br></p>\n\n        <p>1.4.5 \u66F4\u65B0\u5185\u5BB9(21.1.12):</p>\n\n        <p>\u4FEE\u590D\u4E861.4.0\u540E\u53EF\u80FD\u51FA\u73B0\u7684\u79D2\u4F20\u6309\u94AE\u65E0\u6548\u3001\u663E\u793A\u591A\u4E2A\u79D2\u4F20\u6309\u94AE\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.3.7 \u66F4\u65B0\u5185\u5BB9(21.1.3):</p>\n\n        <p>\u4FEE\u590D\u4E86\u4F1A\u5458\u8D26\u53F7\u751F\u621050M\u4EE5\u4E0B\u6587\u4EF6\u65F6\u63D0\u793A \"md5\u83B7\u53D6\u5931\u8D25\" \u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.3.3 \u66F4\u65B0\u5185\u5BB9(20.12.1):</p>\n\n        <p>\u79D2\u4F20\u751F\u6210\u5B8C\u6210\u540E\u70B9\u51FB\u590D\u5236\u6309\u94AE\u4E4B\u524D\u90FD\u53EF\u4EE5\u7EE7\u7EED\u4EFB\u52A1,\u9632\u6B62\u8BEF\u64CD\u4F5C\u5173\u95ED\u9875\u9762\u5BFC\u81F4\u751F\u6210\u7ED3\u679C\u4E22\u5931</p>\n\n        <p>\u4FEE\u6539\u4EE3\u7801\u6267\u884C\u987A\u5E8F\u9632\u6B62\u79D2\u4F20\u6309\u94AE\u51FA\u73B0\u5728\u6700\u5DE6\u7AEF</p>\n\n        <p>\u4FEE\u590D\u4E86\u8DE8\u57DF\u63D0\u793A\u4E2D\u5931\u6548\u7684\u8BF4\u660E\u56FE\u7247</p>\n\n        <p><br></p>\n\n        <p>1.2.9 \u66F4\u65B0\u5185\u5BB9(20.11.11):</p>\n\n        <p>\u751F\u6210\u79D2\u4F20\u7684\u5F39\u7A97\u6DFB\u52A0\u4E86\u5173\u95ED\u6309\u94AE</p>\n\n        <p>\u5220\u9664\u4E86\u5168\u90E8\u751F\u6210\u5931\u8D25\u65F6\u7684\u590D\u5236\u548C\u6D4B\u8BD5\u6309\u94AE</p>\n\n        <p>\u79D2\u4F20\u751F\u6210\u540E\u52A0\u4E86\u4E00\u4E2A\u5BFC\u51FA\u6587\u4EF6\u8DEF\u5F84\u7684\u9009\u9879(\u9ED8\u8BA4\u4E0D\u5BFC\u51FA)</p>\n\n        <p>\u5728\u8F93\u5165\u4FDD\u5B58\u8DEF\u5F84\u7684\u5F39\u7A97\u6DFB\u52A0\u4E86\u6821\u9A8C, \u9632\u6B62\u8F93\u5165\u9519\u8BEF\u8DEF\u5F84</p>\n\n        <p><br></p>\n\n        <p>1.2.5 \u66F4\u65B0\u5185\u5BB9(20.11.4):</p>\n\n        <p>\u4F18\u5316\u6309\u94AE\u6837\u5F0F, \u6DFB\u52A0\u4E86md5\u83B7\u53D6\u5931\u8D25\u7684\u62A5\u9519</p>\n\n        <p>\u4FEE\u590D\u4ECEpan.baidu.com\u8FDB\u5165\u540E\u4E0D\u663E\u793A\u751F\u6210\u6309\u94AE\u7684\u95EE\u9898</p>\n\n        <p><br></p>\n\n        <p>1.2.4 \u66F4\u65B0\u5185\u5BB9(20.11.2):</p>\n\n        <p>\u65B0\u589E\u751F\u6210\u79D2\u4F20:</p>\n\n        <p>\u9009\u62E9\u6587\u4EF6\u6216\u6587\u4EF6\u5939\u540E\u70B9\u51FB \"\u751F\u6210\u79D2\u4F20\" \u5373\u53EF\u5F00\u59CB\u751F\u6210</p>\n\n        <p><br></p>\n\n        <p>\u7EE7\u7EED\u672A\u5B8C\u6210\u4EFB\u52A1:</p>\n\n        <p>\u82E5\u751F\u6210\u79D2\u4F20\u671F\u95F4\u5173\u95ED\u4E86\u7F51\u9875, \u518D\u6B21\u70B9\u51FB \"\u751F\u6210\u79D2\u4F20\" \u5373\u53EF\u7EE7\u7EED\u4EFB\u52A1</p>\n\n        <p><br></p>\n\n        <p>\u6D4B\u8BD5\u79D2\u4F20\u529F\u80FD:</p>\n\n        <p>\u751F\u6210\u5B8C\u6210\u540E, \u70B9\u51FB\"\u6D4B\u8BD5\"\u6309\u94AE, \u4F1A\u81EA\u52A8\u8F6C\u5B58\u5E76\u8986\u76D6\u6587\u4EF6(\u6587\u4EF6\u5185\u5BB9\u4E0D\u53D8), \u4EE5\u68C0\u6D4B\u79D2\u4F20\u6709\u6548\u6027, \u4EE5\u53CA\u4FEE\u590Dmd5\u9519\u8BEF\u9632\u6B62\u79D2\u4F20\u5931\u6548</p>\n\n        </span></div></div>";
   myInit();
 }();
