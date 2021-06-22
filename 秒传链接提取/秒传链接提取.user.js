@@ -15,7 +15,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.3
+// @version         1.7.4
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -1133,7 +1133,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
     var themes = GM_getValue('Themes') || 'Minimal';
     console.log(themes);
-    var css_code = GM_getValue(themes);
+    var css_code = GM_getValue("1.7.4".concat(themes));
 
     if (css_code) {
       GM_addStyle(css_code);
@@ -1141,7 +1141,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
 
     if (style && themes === 'Minimal') {
-      GM_setValue(themes, style);
+      GM_setValue("1.7.4".concat(themes), style);
       GM_addStyle(style);
       return;
     }
@@ -1158,7 +1158,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           return;
         }
 
-        GM_setValue(themes, style);
+        GM_setValue("1.7.4".concat(themes), style);
         GM_addStyle(style);
       },
       onerror: function onerror(r) {

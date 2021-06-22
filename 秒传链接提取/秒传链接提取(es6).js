@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.3
+// @version         1.7.4
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -1121,13 +1121,13 @@
         // 暴力猴直接粘贴脚本代码时可能不会将resource中的数据下载缓存，fallback到下载css代码
         let themes = GM_getValue('Themes') || 'Minimal';
         console.log(themes);
-        let css_code = GM_getValue(themes);
+        let css_code = GM_getValue(`1.7.4${themes}`);
         if (css_code) {
             GM_addStyle(css_code);
             return;
         }
         if (style && themes === 'Minimal') {
-            GM_setValue(themes, style);
+            GM_setValue(`1.7.4${themes}`, style);
             GM_addStyle(style);
             return;
         }
@@ -1141,7 +1141,7 @@
                     alert('秒传链接提取:\n外部资源加载错误, 脚本无法运行, 请尝试刷新页面');
                     return;
                 }
-                GM_setValue(themes, style);
+                GM_setValue(`1.7.4${themes}`, style);
                 GM_addStyle(style);
             },
             onerror: function (r) {
