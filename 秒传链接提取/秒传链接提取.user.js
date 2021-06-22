@@ -372,7 +372,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     interval = GM_getValue('interval') || 15;
     Swal.fire({
       title: '批量生成注意',
-      text: '检测到超会账号且生成的文件较多, 会因为生成过快导致接口被限制(#403), 请输入生成间隔(1-30秒,推荐15)防止上述情况',
+      text: '检测到超会账号且生成文件较多, 会因生成过快导致接口被限制(#403), 请输入生成间隔(1-30秒,推荐15)防止上述情况',
       input: 'text',
       inputValue: interval,
       showCancelButton: false,
@@ -908,7 +908,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         return '请求错误(请尝试使用最新版Chrome浏览器)';
 
       case 403:
-        return '文件获取失败(生成过于频繁导致接口被限,请稍后再试)';
+        return '文件获取失败(请等待24h再试)';
 
       case 404:
         return '文件不存在(秒传未生效)';
@@ -942,14 +942,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       case 996:
         return 'md5获取失败(请参考分享教程)';
 
-      case 888:
-        return '该文件不支持修复';
-
-      case 999:
-        return 'uploadid获取失败';
-
       case 500:
-        return '服务器错误,请稍后再试';
+        return '服务器错误(请等待24h再试)';
 
       default:
         return '未知错误';
