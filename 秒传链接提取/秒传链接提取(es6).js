@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.1
+// @version         1.7.2
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -574,7 +574,7 @@
             myGenerater(file_id + 1);
             return;
         }
-        if (file_info.size > 21474836480) {
+        if (file_info.size >= 21474836480) {
             file_info.errno = 3939;
             myGenerater(file_id + 1);
             return;
@@ -585,13 +585,14 @@
 
         var dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
         if (!failed) {
-            appid_id = file_info.size < 50000000 ? 0 : 3;
+            appid_id = file_info.size < 50000000 ? 0 : 2;
         }
         var get_dl_par = {
             url: pcs_url + `?app_id=${appid_list[appid_id]}&method=download&path=${encodeURIComponent(path)}`,
             type: 'GET',
             headers: {
-                'Range': `bytes=0-${dl_size}`
+                'Range': `bytes=0-${dl_size}`,
+                'User-Agent': 'netdisk;8.2.0;android-android;4.4.4'
             },
             responseType: 'arraybuffer',
             onprogress: show_prog,
@@ -628,7 +629,7 @@
                         myGenerater(file_id + 1);
                     }, interval_mode ? interval * 1000 : 1000);
                 } else {
-                    console.log(`return #403, appid: ${appid_list[appid_id]}`);
+                    console.log(`return #${r.status}, appid: ${appid_list[appid_id]}`);
                     if (r.status == 403 && appid_id < (appid_list.length - 1)) {
                         myGenerater(file_id, appid_id + 1, true);
                     } else {
@@ -818,7 +819,7 @@
                     codeInfo.forEach(function (item) {
                         if (item.errno) {
                             var file_name = item.path;
-                            if (item.errno === 2 && item.size > 21474836480) {
+                            if (item.errno === 2 && item.size >= 21474836480) {
                                 item.errno = 3939;
                             }
                             var errText = checkErrno(item.errno, item.size);
@@ -1151,9 +1152,9 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.6.8_no_first')) {
+        if (!GM_getValue('1.7.2_no_first')) {
             Swal.fire({
-                title: `秒传链接提取 1.6.8 更新内容(21.6.18):`,
+                title: `秒传链接提取 1.7.2 更新内容(21.6.23):`,
                 html: update_info,
                 heightAuto: false,
                 scrollbarPadding: false,
@@ -1161,7 +1162,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.6.8_no_first', true);
+                GM_setValue('1.7.2_no_first', true);
             });
         }
     };
@@ -1219,11 +1220,19 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>移除 <span style="color: red;">修复下载</span> 功能(已在21年4月上旬失效), 后续不会再考虑修复该功能</p>
+        <p>修复了生成秒传时报错<span style="color: red;">#403</span>的问题</p>
 
         <p><br></p>
 
         <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
+
+        <p><br></p>
+
+        <p>1.6.8 更新内容(21.6.18)</p>
+
+        <p><br></p>
+
+        <p>移除 <span style="color: red;">修复下载</span> 功能(已在21年4月上旬失效), 后续不会再考虑修复该功能</p>
 
         <p><br></p>
 
