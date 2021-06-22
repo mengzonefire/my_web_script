@@ -37,9 +37,7 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 （若秒传按钮不显示、无反应或弹窗卡死, 请按F12打开控制台查看&截图反馈报错）
 
-1. 安装脚本显示编译错误请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: rgb(184, 49, 47);">不兼容</span>油猴子Greasemonkey
-
-2. 火狐firefox用户使用会员账号生成秒传时, 会报 "文件获取失败(#403)", 通过 [UA切换插件](https://addons.mozilla.org/zh-CN/firefox/addon/uaswitcher) 切换为Chrome的UA, 即可解决
+1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: rgb(184, 49, 47);">不兼容</span>油猴子Greasemonkey
 
 ## 待更新
 1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
