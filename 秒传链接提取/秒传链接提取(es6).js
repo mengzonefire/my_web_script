@@ -1048,7 +1048,7 @@
 
     function Add_content(content) {
         var hasAdd = false;
-        if (!GM_getValue('kill_feedback_1.6.1')) {
+        if (!GM_getValue('kill_feedback_1.7.2')) {
             hasAdd = true;
             content.innerHTML += `<p><br></p>`;
             content.innerHTML += html_feedback;
@@ -1056,13 +1056,13 @@
                 var html_tag = $('#kill_feedback');
                 if (!html_tag.length) return false;
                 $('#kill_feedback').click(function () {
-                    GM_setValue('kill_feedback_1.6.1', true);
+                    GM_setValue('kill_feedback_1.7.2', true);
                     $('#bdcode_feedback').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        if (!GM_getValue('kill_donate_1.6.1')) {
+        if (!GM_getValue('kill_donate_1.7.2')) {
             if (!hasAdd) {
                 content.innerHTML += `<p><br></p>`;
             }
@@ -1071,7 +1071,7 @@
                 var html_tag = $('#kill_donate');
                 if (!html_tag.length) return false;
                 $('#kill_donate').click(function () {
-                    GM_setValue('kill_donate_1.6.1', true);
+                    GM_setValue('kill_donate_1.7.2', true);
                     $('#bdcode_donate').remove();
                 });
                 clearInterval(loop);
