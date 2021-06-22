@@ -50,7 +50,7 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 ## 更新历史
 
-21.6.18更新：修复了生成秒传时报错<span style="color: red;">#403</span>的问题
+21.6.23更新：修复了生成秒传时报错<span style="color: red;">#403</span>的问题
 
 21.6.18更新：转存秒传添加bdstoken参数, 防止报错"转存失败(#2)", 并支持了新版度盘页面下的转存功能:
 
