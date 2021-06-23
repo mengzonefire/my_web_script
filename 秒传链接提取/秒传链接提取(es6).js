@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.4
+// @version         1.7.5
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -585,7 +585,7 @@
 
         var dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
         if (!failed) {
-            appid_id = file_info.size < 50000000 ? 0 : 2;
+            appid_id = file_info.size < 50000000 ? 0 : 3;
         }
         var get_dl_par = {
             url: pcs_url + `?app_id=${appid_list[appid_id]}&method=download&path=${encodeURIComponent(path)}`,
