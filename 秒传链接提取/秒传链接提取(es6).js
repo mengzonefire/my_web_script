@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.7
+// @version         1.7.8
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -27,9 +27,12 @@
 // ==/UserScript==
 ! function () {
     'use strict';
+    const rapid_url = '/api/rapidupload';
     const bdstoken_url = '/api/gettemplatevariable';
-    const info_url = '/rest/2.0/xpan/nas?method=uinfo'; 
+    const info_url = '/rest/2.0/xpan/nas?method=uinfo';
     const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
+    const precreate_url = '/api/precreate';
+    const create_url = '/api/create?bdstoken=';
     const meta_url = 'http://pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
     const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
     const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
@@ -170,8 +173,7 @@
     input[type='checkbox'].switch:disabled:not(:checked):after {
       opacity: .6;
     }`
-    var failed = 0,
-        vip_type = 0,
+    var vip_type = 0,
         interval = 0,
         check_mode = false,
         interval_mode = false,
@@ -199,7 +201,7 @@
         inputValue: GM_getValue('with_path'),
         inputPlaceholder: '导出文件夹目录结构',
     };
-    var show_prog = function (r) {
+    const show_prog = function (r) {
         gen_prog.textContent = `${parseInt((r.loaded / r.total) * 100)}%`;
     };
 
@@ -516,11 +518,11 @@
         });
         if (file_id >= file_info_list.length) {
             bdcode = '';
-            var failed_info = '';
-            var gen_failed = 0;
+            let failed_info = '';
+            let gen_failed_count = 0;
             file_info_list.forEach(function (item) {
                 if (item.hasOwnProperty('errno')) {
-                    gen_failed++;
+                    gen_failed_count++;
                     failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno, item.size)}(#${item.errno})</p>`
                 } else {
                     gen_success_list.push(item);
@@ -532,7 +534,7 @@
                 failed_info = '<p>失败文件列表:</p>' + failed_info;
             }
             Swal.fire({
-                title: `生成完毕 共${file_info_list.length}个, 失败${gen_failed}个!`,
+                title: `生成完毕 共${file_info_list.length}个, 失败${gen_failed_count}个!`,
                 confirmButtonText: '复制秒传代码',
                 cancelButtonText: '取消',
                 showCloseButton: true,
@@ -545,12 +547,10 @@
                     let loop = setInterval(() => {
                         var html_tag = $('#check_md5_btn');
                         if (!html_tag.length) return false;
-                        $('#check_md5_btn').click(function () {
-                            test_bdlink();
-                        });
+                        $('#check_md5_btn').click(function () { test_bdlink(); });
                         clearInterval(loop);
                     }, 50);
-                    Add_content(document.createElement('div'));
+                    Add_content();
                 }
             }).then((result) => {
                 if (!result.dismiss) {
@@ -573,7 +573,7 @@
             myGenerater(file_id + 1);
             return;
         }
-        if (file_info.size >= 21474836480) {
+        if (file_info.size > 21474836480) {
             file_info.errno = 3939;
             myGenerater(file_id + 1);
             return;
@@ -808,34 +808,23 @@
 
     function saveFile(i, try_flag) {
         if (i >= codeInfo.length) {
+            let failed_info = ' ';
+            let failed_count = 0;
+            codeInfo.forEach(function (item) {
+                if (item.errno === 2 && item.size > 21474836480) { item.errno = 3939; }
+                if (item.errno) {
+                    failed_count++;
+                    failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno, item.size)}(#${item.errno})</p>`
+                }
+            });
             Swal.fire({
-                title: `${check_mode ? '测试' : '转存'}完毕 共${codeInfo.length}个 失败${failed}个!`,
+                title: `${check_mode ? '测试' : '转存'}完毕 共${codeInfo.length}个 失败${failed_count}个!`,
                 confirmButtonText: check_mode ? '复制秒传代码' : '确定',
                 showCloseButton: true,
-                html: ' ',
+                html: failed_info,
                 ...(check_mode && checkbox_par),
                 willOpen: () => {
-                    var content = Swal.getHtmlContainer();
-                    codeInfo.forEach(function (item) {
-                        if (item.errno) {
-                            var file_name = item.path;
-                            if (item.errno === 2 && item.size >= 21474836480) {
-                                item.errno = 3939;
-                            }
-                            var errText = checkErrno(item.errno, item.size);
-                            var str1 = `文件：${file_name}`;
-                            var str2 = `失败原因：${errText}(#${item.errno})`;
-                            var ele1 = document.createElement('p');
-                            var ele2 = document.createElement('p');
-                            var text1 = document.createTextNode(str1);
-                            var text2 = document.createTextNode(str2);
-                            ele1.appendChild(text1);
-                            ele2.appendChild(text2);
-                            content.appendChild(ele1);
-                            content.appendChild(ele2);
-                        }
-                    });
-                    Add_content(document.createElement('div'));
+                    Add_content();
                     var _dir = (dir || '').replace(/\/$/, '');
                     if (_dir) {
                         if (_dir.charAt(0) !== '/') {
@@ -871,10 +860,9 @@
                 if (new_flag) { location.reload(); }
                 else { require('system-core:system/baseService/message/message.js').trigger('system-refresh'); }
             });
-            failed = 0;
             return;
         }
-        var file = codeInfo[i];
+        let file = codeInfo[i];
         file_num.textContent = (i + 1).toString() + ' / ' + codeInfo.length.toString();
         switch (try_flag) {
             case 0:
@@ -885,9 +873,15 @@
                 break;
             case 2:
                 file.md5 = randomStringTransform(file.md5);
+            case 3:
+                saveFile_v2(i);
+                return;
+            default:
+                saveFile(i + 1, 0);
+                return;
         }
         $.ajax({
-            url: `/api/rapidupload?bdstoken=${bdstoken}${check_mode ? '&rtype=3' : ''}`,
+            url: `${rapid_url}?bdstoken=${bdstoken}${check_mode ? '&rtype=3' : ''}`,
             type: 'POST',
             data: {
                 path: dir + file.path,
@@ -896,21 +890,13 @@
                 'content-length': file.size
             }
         }).success(function (r) {
-            if (file.path.match(/["\\\:*?<>|]/)) {
-                codeInfo[i].errno = 2333;
-            } else {
-                codeInfo[i].errno = r.errno;
-            }
+            if (file.path.match(/["\\\:*?<>|]/)) { codeInfo[i].errno = 2333; }
+            else { codeInfo[i].errno = r.errno; }
         }).fail(function (r) {
             codeInfo[i].errno = 114;
         }).always(function () {
-            if (codeInfo[i].errno === 404 && try_flag < 2) {
-                saveFile(i, try_flag + 1);
-                return;
-            } else if (codeInfo[i].errno) {
-                failed++;
-            }
-            saveFile(i + 1, 0);
+            if (codeInfo[i].errno === 404) { saveFile(i, try_flag + 1); }
+            else { saveFile(i + 1, 0); };
         });
     }
 
@@ -963,24 +949,15 @@
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputValidator: (value) => {
-                if (!value) {
-                    return '链接不能为空';
-                }
-                if (value === 'setting') {
-                    return;
-                }
+                if (!value) { return '链接不能为空'; }
+                if (value === 'setting') { return; }
                 codeInfo = DuParser.parse(value);
-                if (!codeInfo.length) {
-                    return '未识别到正确的链接';
-                }
+                if (!codeInfo.length) { return '未识别到正确的链接'; }
             }
         }).then((result) => {
             if (!result.dismiss) {
-                if (result.value === 'setting') {
-                    setting();
-                } else {
-                    Process();
-                }
+                if (result.value === 'setting') { setting(); }
+                else { Process(); }
             }
         });
     }
@@ -1046,23 +1023,24 @@
         return bdlink;
     }
 
-    function Add_content(content) {
-        var hasAdd = false;
-        if (!GM_getValue('kill_feedback_1.7.3')) {
+    function Add_content() {
+        let content = document.createElement('div')
+        let hasAdd = false;
+        if (!GM_getValue('kill_feedback_1.7.8')) {
             hasAdd = true;
             content.innerHTML += `<p><br></p>`;
             content.innerHTML += html_feedback;
             let loop = setInterval(() => {
-                var html_tag = $('#kill_feedback');
+                let html_tag = $('#kill_feedback');
                 if (!html_tag.length) return false;
                 $('#kill_feedback').click(function () {
-                    GM_setValue('kill_feedback_1.7.3', true);
+                    GM_setValue('kill_feedback_1.7.8', true);
                     $('#bdcode_feedback').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        if (!GM_getValue('kill_donate_1.7.3')) {
+        if (!GM_getValue('kill_donate_1.7.8')) {
             if (!hasAdd) {
                 content.innerHTML += `<p><br></p>`;
             }
@@ -1071,13 +1049,71 @@
                 var html_tag = $('#kill_donate');
                 if (!html_tag.length) return false;
                 $('#kill_donate').click(function () {
-                    GM_setValue('kill_donate_1.7.3', true);
+                    GM_setValue('kill_donate_1.7.8', true);
                     $('#bdcode_donate').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
         Swal.getHtmlContainer().appendChild(content);
+    }
+
+    function saveFile_v2_create(i) {
+        let file_info = codeInfo[i];
+        $.ajax({
+            url: create_url + bdstoken,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                block_list: JSON.stringify([file_info.md5.toLowerCase()]),
+                uploadid: file_info.uploadid,
+                path: dir + file_info.path,
+                size: file_info.size,
+                mode: 1,
+                isdir: 0,
+                rtype: check_mode ? 3 : 0,
+                a: 'commit',
+                sequence: 1,
+                autoinit: 1
+            }
+        }).success(function (r) {
+            file_info.errno = r.errno;
+        }).fail(function (r) {
+            file_info.errno = 114;
+        }).always(function () {
+            saveFile(i + 1, 0);
+        });
+    }
+
+    function saveFile_v2(i) {
+        let file_info = codeInfo[i];
+        $.ajax({
+            url: precreate_url,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                block_list: JSON.stringify([file_info.md5.toLowerCase()]),
+                path: dir + file_info.path,
+                size: file_info.size,
+                mode: 1,
+                isdir: 0,
+                autoinit: 1,
+            }
+        }).success(function (r) {
+            if (!r.errno) {
+                // 若返回的block_list非空则表示不识别该md5(#404)
+                if (r.block_list.length) { file_info.errno = 404; }
+                else if (r.uploadid) {
+                    file_info.uploadid = r.uploadid;
+                    saveFile_v2_create(i);
+                    return;
+                }
+            } else { file_info.errno = r.errno; }
+            saveFile(i + 1, 0);
+        }).fail(function (r) {
+            file_info.errno = 114;
+            saveFile(i + 1, 0);
+        });
     }
 
     function checkVipType() {
@@ -1152,9 +1188,9 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.7.3_no_first')) {
+        if (!GM_getValue('1.7.8_no_first')) {
             Swal.fire({
-                title: `秒传链接提取 1.7.3 更新内容(21.6.23):`,
+                title: `秒传链接提取 更新内容`,
                 html: update_info,
                 heightAuto: false,
                 scrollbarPadding: false,
@@ -1162,7 +1198,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.7.3_no_first', true);
+                GM_setValue('1.7.8_no_first', true);
             });
         }
     };
@@ -1220,17 +1256,29 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
+        <p>1.7.8 更新内容(21.6.25):</p>
+
+        <p><br></p>
+
+        <p>修复了绝大部分转存提示 "<span style="color: red;">文件不存在(秒传未生效)(#404)</span>" 的问题</p>
+
+        <p><br></p>
+
+        <p>若喜欢该脚本可前往 <a href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者</p>
+
+        <p><br></p>
+
+        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank"> greasyfork页 </a>反馈</p>
+
+        <p><br></p>
+
+        <p>1.7.3 更新内容(21.6.23):</p>
+
         <p>升级样式&主题, 提升观感, 修复了设置内的主题适配</p>
 
         <p><br></p>
 
-        <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">greasyfork页</a>反馈</p>
-
-        <p><br></p>
-
         <p>1.6.8 更新内容(21.6.18)</p>
-
-        <p><br></p>
 
         <p>移除 <span style="color: red;">修复下载</span> 功能(已在21年4月上旬失效), 后续不会再考虑修复该功能</p>
 

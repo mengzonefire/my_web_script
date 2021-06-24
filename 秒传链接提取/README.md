@@ -46,6 +46,8 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 ## 更新历史
 
+21.6.25更新：修复了绝大部分转存提示 "<span style="color: red;">文件不存在(秒传未生效)(#404)</span>" 的问题
+
 21.6.24更新：修复从yun.baidu.com进入时, 弹窗提示 "bdskoten获取失败" 的问题
 
 21.6.23更新：将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)
