@@ -827,9 +827,7 @@
                     Add_content();
                     var _dir = (dir || '').replace(/\/$/, '');
                     if (_dir) {
-                        if (_dir.charAt(0) !== '/') {
-                            _dir = '/' + _dir;
-                        }
+                        if (_dir.charAt(0) !== '/') { _dir = '/' + _dir; }
                         const cBtn = Swal.getConfirmButton();
                         const btn = cBtn.cloneNode();
                         btn.textContent = '打开目录';
