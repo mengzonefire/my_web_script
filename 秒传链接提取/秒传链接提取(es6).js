@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.5
+// @version         1.7.6
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -33,7 +33,7 @@
     const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
     const bdstoken_url = 'https://pan.baidu.com/api/gettemplatevariable';
     const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
-    //使用'250528', '265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403
+    //使用'265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403, 超会账号使用'250528'下载部分文件不返回md5
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
     const css_url = {
         'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
@@ -191,7 +191,7 @@
     <a id="kill_donate" ${myBtnStyle}><span style="width: auto;">不再显示</span></a></p>`;
     const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
     <a id="kill_feedback" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></a></p>`;
-    const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"总是允许"或"总是允许全部"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
+    const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"<span style="color: red;">总是允许</span>"或"<span style="color: red;">总是允许全部</span>"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
     const html_btn_new = '<a id="bdlink_btn" style="margin-left: 8px;" class="nd-upload-button upload-wrapper"><span class="nd-common-btn nd-file-list-toolbar-action-item u-btn u-btn--primary u-btn--medium u-btn--default is-has-icon"><i class="iconfont inline-block-v-middle icon-copy"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">秒传</span></span> </a>';
     const html_btn_gen_new = '<button id="gen-bdlink-button" class="u-btn nd-common-btn nd-file-list-toolbar-action-item is-need-left-sep u-btn--normal u-btn--medium u-btn--default is-has-icon"> <span><i class="iconfont inline-block-v-middle nd-file-list-toolbar__action-item-icon icon-share"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">生成秒传</span></span> </button>';
     var checkbox_par = {
@@ -313,15 +313,17 @@
 
 
     function gen_bd_link_event() {
-        if (!GM_getValue('gen_no_first')) {
+        if (!GM_getValue('show_csd_warning')) {
             Swal.fire({
-                title: '首次使用请注意',
+                title: '请允许跨域访问',
                 showCloseButton: true,
                 allowOutsideClick: false,
-                html: csd_hint_html,
+                input: 'checkbox',
+                inputPlaceholder: '不再显示',
+                html: csd_hint_html
             }).then((result) => {
-                if (result.value) {
-                    GM_setValue('gen_no_first', true);
+                GM_setValue('show_csd_warning', result.value)
+                if (!result.dismiss) {
                     select_list = getSelectedFileList();
                     add_file_list(select_list);
                 }
@@ -426,6 +428,7 @@
         Swal.fire({
             title: '秒传生成中',
             showCloseButton: true,
+            showConfirmButton: false,
             allowOutsideClick: false,
             html: '<p>正在生成第 <gen_num></gen_num> 个</p><p><gen_prog></gen_prog></p>',
             willOpen: () => {
@@ -476,10 +479,6 @@
             Gen_bdlink(file_id);
         });
     }
-
-    var show_prog = function (r) {
-        gen_prog.textContent = `${parseInt((r.loaded / r.total) * 100)}%`;
-    };
 
     function test_bdlink() {
         if (!GM_getValue('show_test_warning')) {
@@ -591,8 +590,7 @@
             url: pcs_url + `?app_id=${appid_list[appid_id]}&method=download&path=${encodeURIComponent(path)}`,
             type: 'GET',
             headers: {
-                'Range': `bytes=0-${dl_size}`,
-                'User-Agent': 'softxm;netdisk'
+                'Range': `bytes=0-${dl_size}`
             },
             responseType: 'arraybuffer',
             onprogress: show_prog,
@@ -605,6 +603,7 @@
                 myGenerater(file_id + 1);
             },
             onload: function (r) {
+                console.log(`dl_url: ${r.finalUrl}`);
                 if (parseInt(r.status / 100) === 2) {
                     var responseHeaders = r.responseHeaders;
                     var file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
@@ -1025,6 +1024,8 @@
         Swal.fire({
             title: `文件${check_mode ? '测试' : '提取'}中`,
             html: `正在${check_mode ? '测试' : '转存'}第 <file_num></file_num> 个`,
+            showCloseButton: true,
+            showConfirmButton: false,
             allowOutsideClick: false,
             willOpen: () => {
                 Swal.showLoading()
@@ -1220,8 +1221,6 @@
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
         <p>升级样式&主题, 提升观感, 修复了设置内的主题适配</p>
-
-        <p>尝试修复生成秒传报错<span style="color: red;">#403</span>的问题</p>
 
         <p><br></p>
 

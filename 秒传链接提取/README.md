@@ -1,8 +1,12 @@
 重新上传脚本及原介绍页, 并继续维护
 
+<del style="color: red;">21.6.23: 目前3G-4G以上的文件生成秒传会报错#500, 正在尝试修复</del>
+
+已验证是百度服务器的问题, 已反馈给度盘客服, 待官方修复.
+
 ## 相关教程
 
-脚本<span style="color: rgb(209, 72, 65);"> 不能正常使用 </span>或<span style="color: rgb(209, 72, 65);"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
+脚本<span style="color: red;"> 不能正常使用 </span>或<span style="color: red;"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
 
 (内含 安卓浏览器 找不到 "电脑版转换" 按钮, 以及 "秒传按钮不显示" 等问题的解决方法)
 
@@ -33,7 +37,7 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 （若秒传按钮不显示、无反应或弹窗卡死, 请按F12打开控制台查看&截图反馈报错）
 
-1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: rgb(184, 49, 47);">不兼容</span>油猴子Greasemonkey
+1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: red;">不兼容</span>油猴子Greasemonkey
 
 ## 待更新
 1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
@@ -43,8 +47,8 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 ## 更新历史
 
 21.6.23更新：
-* 将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)
-* 尝试修复生成秒传报错<span style="color: red;">#403</span>
+
+将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)
 
 21.6.18更新：转存秒传添加bdstoken参数, 防止报错"转存失败(#2)", 并支持了新版度盘页面下的转存功能:
 
