@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.6
+// @version         1.7.7
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -27,11 +27,11 @@
 // ==/UserScript==
 ! function () {
     'use strict';
+    const bdstoken_url = '/api/gettemplatevariable';
+    const info_url = '/rest/2.0/xpan/nas?method=uinfo'; 
+    const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const meta_url = 'http://pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
-    const info_url = 'https://pan.baidu.com/rest/2.0/xpan/nas?method=uinfo';
-    const api_url = 'http://pan.baidu.com/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
-    const bdstoken_url = 'https://pan.baidu.com/api/gettemplatevariable';
     const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
     //使用'265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403, 超会账号使用'250528'下载部分文件不返回md5
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
