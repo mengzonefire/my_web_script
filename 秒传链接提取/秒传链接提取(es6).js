@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.8
+// @version         1.7.9
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -29,14 +29,12 @@
     'use strict';
     const rapid_url = '/api/rapidupload';
     const bdstoken_url = '/api/gettemplatevariable';
-    const info_url = '/rest/2.0/xpan/nas?method=uinfo';
-    const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const precreate_url = '/api/precreate';
     const create_url = '/api/create?bdstoken=';
-    const meta_url = 'http://pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
-    const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file';
-    const appid_list = ['266719', '265486', '250528', '778750', '498065', '309847'];
-    //使用'265486', '266719', 下载50M以上的文件会报403, 黑号情况下部分文件也会报403, 超会账号使用'250528'下载部分文件不返回md5
+    const info_url = '/rest/2.0/xpan/nas?method=uinfo';
+    const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
+    const meta_url2 = '/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=';
+    const meta_url = 'http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
     const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
     const css_url = {
         'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
@@ -511,7 +509,7 @@
         }
     }
 
-    function myGenerater(file_id, appid_id = 0, failed = false) {
+    function myGenerater(file_id) {
         GM_setValue('unfinish', {
             'file_info_list': file_info_list,
             'file_id': file_id
@@ -568,7 +566,8 @@
             });
             return;
         }
-        var file_info = file_info_list[file_id];
+
+        let file_info = file_info_list[file_id];
         if (file_info.hasOwnProperty('errno')) {
             myGenerater(file_id + 1);
             return;
@@ -578,26 +577,60 @@
             myGenerater(file_id + 1);
             return;
         }
-        var path = file_info.path;
         gen_num.textContent = (file_id + 1).toString() + ' / ' + file_info_list.length.toString();
         gen_prog.textContent = '0%';
 
-        var dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
-        if (!failed) {
-            appid_id = file_info.size < 50000000 ? 0 : 3;
-        }
-        var get_dl_par = {
-            url: pcs_url + `?app_id=${appid_list[appid_id]}&method=download&path=${encodeURIComponent(path)}`,
+        let get_dl_par = {
+            url: meta_url + encodeURIComponent(file_info.path),
+            type: 'GET',
+            onerror: function (r) {
+                file_info.errno = 514;
+                myGenerater(file_id + 1);
+            },
+            onload: function (r) {
+                if (parseInt(r.status / 100) !== 2) {
+                    file_info.errno = r.status;
+                    myGenerater(file_id + 1);
+                    return;
+                }
+                let r_json = JSON.parse(r.response);
+                let fs_id = r_json.list[0].fs_id;
+                let get_dl_par = {
+                    url: meta_url2 + JSON.stringify([fs_id]),
+                    dataType: 'json',
+                    type: 'GET',
+                    onerror: function (r) {
+                        file_info.errno = 514;
+                        myGenerater(file_id + 1);
+                    },
+                    onload: function (r) {
+                        let r_json = JSON.parse(r.response);
+                        if (r_json.errno) {
+                            file_info.errno = r_json.errno;
+                            myGenerater(file_id + 1);
+                            return;
+                        }
+                        download_file_data(file_id, r_json.list[0].dlink);
+                    }
+                };
+                GM_xmlhttpRequest(get_dl_par);
+            }
+        };
+        GM_xmlhttpRequest(get_dl_par);
+    }
+
+    function download_file_data(file_id, dlink) {
+        let file_info = file_info_list[file_id];
+        let dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
+        let get_dl_par = {
+            url: dlink,
             type: 'GET',
             headers: {
-                'Range': `bytes=0-${dl_size}`
+                'Range': `bytes=0-${dl_size}`,
+                "User-Agent": 'netdisk;2.2.51.6;netdisk;10.0.63;PC;android-android;QTP/1.0.32.2'
             },
             responseType: 'arraybuffer',
             onprogress: show_prog,
-            ontimeout: function (r) {
-                myGenerater(file_id);
-                console.log('timeout !!!');
-            },
             onerror: function (r) {
                 file_info.errno = 514;
                 myGenerater(file_id + 1);
@@ -628,18 +661,14 @@
                         myGenerater(file_id + 1);
                     }, interval_mode ? interval * 1000 : 1000);
                 } else {
-                    console.log(`return #${r.status}, appid: ${appid_list[appid_id]}`);
-                    if (r.status === 403 && appid_id < (appid_list.length - 1)) {
-                        myGenerater(file_id, appid_id + 1, true);
-                    } else {
-                        file_info.errno = r.status;
-                        myGenerater(file_id + 1);
-                    }
+                    file_info.errno = r.status;
+                    myGenerater(file_id + 1);
                 }
             }
         };
         xmlhttpRequest = GM_xmlhttpRequest(get_dl_par);
     }
+
 
     function try_get_md5(file_id, file_date) {
         var file_info = file_info_list[file_id];
@@ -1186,7 +1215,7 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.7.8_no_first')) {
+        if (!GM_getValue('1.7.9_no_first')) {
             Swal.fire({
                 title: `秒传链接提取 更新内容`,
                 html: update_info,
@@ -1196,7 +1225,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.7.8_no_first', true);
+                GM_setValue('1.7.9_no_first', true);
             });
         }
     };
@@ -1254,11 +1283,13 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>1.7.8 更新内容(21.6.25):</p>
+        <p>1.7.9 更新内容(21.6.28):</p>
 
         <p><br></p>
 
-        <p>修复了绝大部分转存提示 "<span style="color: red;">文件不存在(秒传未生效)(#404)</span>" 的问题</p>
+        <p>1.大幅提升非会员账号生成秒传的速度</p>
+
+        <p>2.修复生成4G以上文件提示"<span style="color: red;">服务器错误(#500)</span>"的问题</p>
 
         <p><br></p>
 
@@ -1267,6 +1298,12 @@
         <p><br></p>
 
         <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank"> greasyfork页 </a>反馈</p>
+
+        <p><br></p>
+
+        <p>1.7.8 更新内容(21.6.25):</p>
+
+        <p>修复了绝大部分转存提示 "<span style="color: red;">文件不存在(秒传未生效)(#404)</span>" 的问题</p>
 
         <p><br></p>
 
