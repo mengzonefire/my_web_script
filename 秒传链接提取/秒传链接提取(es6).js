@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.7.9
+// @version         1.8.0
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -31,7 +31,6 @@
     const bdstoken_url = '/api/gettemplatevariable';
     const precreate_url = '/api/precreate';
     const create_url = '/api/create?bdstoken=';
-    const info_url = '/rest/2.0/xpan/nas?method=uinfo';
     const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const meta_url2 = '/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=';
     const meta_url = 'http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
@@ -171,14 +170,11 @@
     input[type='checkbox'].switch:disabled:not(:checked):after {
       opacity: .6;
     }`
-    var vip_type = 0,
-        interval = 0,
-        check_mode = false,
-        interval_mode = false,
+    var check_mode = false,
         new_flag = false,
         file_info_list = [],
         gen_success_list = [],
-        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, bdstoken;
+        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, bdstoken, interval;
     const myStyle = `style='width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;'`;
     const myStyle2 = `style='color: #09AAFF;'`;
     const myBtnStyle = `style='font-size: 15px;color: #09AAFF;border: 2px solid #C3EAFF;border-radius: 4px;padding: 10px;margin: 0 5px;padding-top: 5px;padding-bottom: 5px; cursor: pointer'`;
@@ -421,10 +417,7 @@
     };
 
     function Gen_bdlink(file_id = 0) {
-        if (file_info_list.length > 10 && vip_type === 2 && !interval_mode) {
-            Set_interval(file_id);
-            return;
-        }
+        interval = file_info_list.length > 1 ? 3000 : 1000;
         Swal.fire({
             title: '秒传生成中',
             showCloseButton: true,
@@ -444,39 +437,8 @@
             if (result.dismiss && xmlhttpRequest) {
                 xmlhttpRequest.abort();
                 GM_deleteValue('unfinish');
-                interval_mode = false;
                 file_info_list = [];
             }
-        });
-    }
-
-    function Set_interval(file_id) {
-        var test_par = /\d+/;
-        interval = GM_getValue('interval') || 15;
-        Swal.fire({
-            title: '批量生成注意',
-            text: '检测到超会账号且生成文件较多, 会因生成过快导致接口被限制(#403), 请输入生成间隔(1-30秒,推荐15)防止上述情况',
-            input: 'text',
-            inputValue: interval,
-            showCancelButton: false,
-            allowOutsideClick: false,
-            confirmButtonText: '确定',
-            inputValidator: (value) => {
-                if (!value) {
-                    return '不能为空';
-                }
-                if (!test_par.test(value)) {
-                    return '输入格式不正确, 请输入数字';
-                }
-                if (Number(value) > 30 || Number(value) < 1) {
-                    return '输入应在1-30之间';
-                }
-            }
-        }).then((result) => {
-            interval = Number(result.value);
-            GM_setValue('interval', interval);
-            interval_mode = true;
-            Gen_bdlink(file_id);
         });
     }
 
@@ -562,7 +524,6 @@
                 file_info_list = [];
                 gen_success_list = [];
                 GM_deleteValue('unfinish');
-                interval_mode = false;
             });
             return;
         }
@@ -659,7 +620,7 @@
                     gen_prog.textContent = '100%';
                     setTimeout(function () {
                         myGenerater(file_id + 1);
-                    }, interval_mode ? interval * 1000 : 1000);
+                    }, interval);
                 } else {
                     file_info.errno = r.status;
                     myGenerater(file_id + 1);
@@ -881,7 +842,6 @@
                     file_info_list = [];
                     gen_success_list = [];
                     GM_deleteValue('unfinish');
-                    interval_mode = false;
                     check_mode = false;
                 }
                 if (new_flag) { location.reload(); }
@@ -936,7 +896,7 @@
             case 400:
                 return '请求错误(请尝试使用最新版Chrome浏览器)';
             case 403:
-                return '文件获取失败(请等待24h再试)';
+                return '接口被限制(请等待24h再试)';
             case 404:
                 return '文件不存在(秒传未生效)';
             case 2:
@@ -1143,20 +1103,6 @@
         });
     }
 
-    function checkVipType() {
-        var info_par = {
-            url: info_url,
-            type: 'GET',
-            responseType: 'json',
-            onload: function (r) {
-                if (r.response.hasOwnProperty('vip_type')) {
-                    vip_type = r.response.vip_type;
-                }
-            }
-        };
-        GM_xmlhttpRequest(info_par);
-    }
-
     function get_bdstoken() {
         $.ajax({
             url: bdstoken_url,
@@ -1170,7 +1116,6 @@
                 bdstoken = r.result.bdstoken;
                 initButtonHome();
                 initButtonGen();
-                checkVipType();
             } else {
                 alert('获取bdstoken失败, 请尝试重新登录');
             }
