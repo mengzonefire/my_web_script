@@ -581,6 +581,7 @@
     }
 
     function download_file_data(file_id, dlink) {
+        console.log(`dlink: ${dlink}`);
         let file_info = file_info_list[file_id];
         let dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
         let get_dl_par = {
@@ -961,7 +962,7 @@
             Swal.fire({
                 title: '请输入保存路径',
                 input: 'text',
-                inputPlaceholder: '格式示例：/GTA5/, 默认保存在根目录',
+                inputPlaceholder: '格式示例：/GTA5/, 留空保存在根目录',
                 inputValue: dir,
                 showCancelButton: true,
                 confirmButtonText: '确定',
