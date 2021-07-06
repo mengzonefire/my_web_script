@@ -1,8 +1,6 @@
 重新上传脚本及原介绍页, 并继续维护
 
-<del style="color: red;">21.6.23: 目前3G-4G以上的文件生成秒传会报错#500, 正在尝试修复</del>
-
-已验证是百度服务器的问题, ~~已反馈给度盘客服, 待官方修复~~, 21.6.28: 官方迟迟不修复, 只好自己修了.
+若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
 
 ## 相关教程
 
@@ -14,6 +12,8 @@
 
 生成&分享过程中遇到问题(例如<span style="color: red;">秒传无效</span>/md5获取失败/<span style="color: red;">文件和谐</span>)可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
 
+详细的关于 <span style="color: red;">文件和谐</span> 的教程可参考 [防和谐教程](https://shimo.im/docs/DGdDwPwTDhvyq6KX/)
+
 ## 脚本说明
 
 * 使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.githubassets.com/favicons/favicon.png) GitHub](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
@@ -22,8 +22,6 @@
 
 PS: 1.7.0版本支持了新版度盘页面, 目前官方未强制跳转新版, 如果要通过一键秒传跳转新版, 则url格式为`https://pan.baidu.com/disk/main#bdlink=[参数]`
 
-
-* 若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
 
 ## 常见秒传格式示例
 
@@ -45,6 +43,8 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 3. ~~修复设置为非默认主题时, 窗口内会出现警告标识的问题~~ (完成, 实际为主题包不适配旧版sweetalert2)
 
 ## 更新历史
+
+21.7.6更新: 支持转存与生成 <span style="color: red;">20G以上</span> 文件的秒传
 
 21.6.28更新: 
 

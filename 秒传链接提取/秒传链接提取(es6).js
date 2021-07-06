@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.0
+// @version         1.8.1
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -29,12 +29,11 @@
     'use strict';
     const rapid_url = '/api/rapidupload';
     const bdstoken_url = '/api/gettemplatevariable';
-    const precreate_url = '/api/precreate';
-    const create_url = '/api/create?bdstoken=';
+    const precreate_url = '/rest/2.0/xpan/file?method=precreate';
+    const create_url = '/rest/2.0/xpan/file?method=create';
     const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const meta_url2 = '/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=';
     const meta_url = 'http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
-    const bad_md5 = ['fcadf26fc508b8039bee8f0901d9c58e', '2d9a55b7d5fe70e74ce8c3b2be8f8e43', 'b912d5b77babf959865100bf1d0c2a19'];
     const css_url = {
         'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
         'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css',
@@ -483,7 +482,7 @@
             file_info_list.forEach(function (item) {
                 if (item.hasOwnProperty('errno')) {
                     gen_failed_count++;
-                    failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno, item.size)}(#${item.errno})</p>`
+                    failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno)}(#${item.errno})</p>`
                 } else {
                     gen_success_list.push(item);
                     bdcode += `${item.md5}#${item.md5s}#${item.size}#${item.path}\n`;
@@ -533,11 +532,6 @@
             myGenerater(file_id + 1);
             return;
         }
-        if (file_info.size > 21474836480) {
-            file_info.errno = 3939;
-            myGenerater(file_id + 1);
-            return;
-        }
         gen_num.textContent = (file_id + 1).toString() + ' / ' + file_info_list.length.toString();
         gen_prog.textContent = '0%';
 
@@ -556,6 +550,8 @@
                 }
                 let r_json = JSON.parse(r.response);
                 let fs_id = r_json.list[0].fs_id;
+                let md5 = r_json.list[0].md5.match(/[\dA-Fa-f]{32}/);
+                if (md5) { file_info.md5 = md5[0].toLowerCase(); }
                 let get_dl_par = {
                     url: meta_url2 + JSON.stringify([fs_id]),
                     dataType: 'json',
@@ -581,7 +577,6 @@
     }
 
     function download_file_data(file_id, dlink) {
-        console.log(`dlink: ${dlink}`);
         let file_info = file_info_list[file_id];
         let dl_size = file_info.size < 262144 ? file_info.size - 1 : 262143;
         let get_dl_par = {
@@ -598,24 +593,25 @@
                 myGenerater(file_id + 1);
             },
             onload: function (r) {
-                console.log(`dl_url: ${r.finalUrl}`);
+                // console.log(`dl_url: ${r.finalUrl}`);
                 if (parseInt(r.status / 100) === 2) {
-                    var responseHeaders = r.responseHeaders;
-                    var file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
-                    if (file_md5) {
-                        file_md5 = file_md5[1].toLowerCase();
-                    } else {
-                        try_get_md5(file_id, r.response);
-                        return;
+                    let responseHeaders = r.responseHeaders;
+                    if (!file_info.md5) {
+                        let file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
+                        if (file_md5) {
+                            file_info.md5 = file_md5[1].toLowerCase();
+                        } else {
+                            file_info.errno = 996;
+                            myGenerater(file_id + 1);
+                            return;
+                        }
                     }
-                    //bad_md5内的三个md5是和谐文件返回的, 第一个是txt格式的"温馨提示.txt", 第二个是视频格式的（俗称5s）,第三个为新发现的8s视频文件
-                    if (bad_md5.indexOf(file_md5) !== -1 || r.finalUrl.indexOf('issuecdn.baidupcs.com') !== -1) {
+                    if (r.finalUrl.indexOf('issuecdn.baidupcs.com') !== -1) {
                         file_info.errno = 1919;
                     } else {
-                        var spark = new SparkMD5.ArrayBuffer();
+                        let spark = new SparkMD5.ArrayBuffer();
                         spark.append(r.response);
-                        var slice_md5 = spark.end();
-                        file_info.md5 = file_md5;
+                        let slice_md5 = spark.end();
                         file_info.md5s = slice_md5;
                     }
                     gen_prog.textContent = '100%';
@@ -629,28 +625,6 @@
             }
         };
         xmlhttpRequest = GM_xmlhttpRequest(get_dl_par);
-    }
-
-
-    function try_get_md5(file_id, file_date) {
-        var file_info = file_info_list[file_id];
-        var get_dl_par = {
-            url: meta_url + encodeURIComponent(file_info.path),
-            type: 'GET',
-            onload: function (r) {
-                var file_md5 = r.responseText.match(/"block_list":\["([\da-f]{32})"\]/i) || r.responseText.match(/md5":"([\da-f]{32})"/i)
-                if (file_md5) {
-                    file_info.md5 = file_md5[1].toLowerCase();
-                    var spark = new SparkMD5.ArrayBuffer();
-                    spark.append(file_date);
-                    file_info.md5s = spark.end();
-                } else {
-                    file_info.errno = 996;
-                }
-                myGenerater(file_id + 1);
-            }
-        };
-        GM_xmlhttpRequest(get_dl_par);
     }
 
     /**
@@ -703,7 +677,7 @@
     function DuParser() { }
 
     DuParser.parse = function generalDuCodeParse(szUrl) {
-        var r;
+        let r;
         if (szUrl.indexOf('bdpan') === 0) {
             r = DuParser.parseDu_v1(szUrl);
             r.ver = 'PanDL';
@@ -802,10 +776,9 @@
             let failed_info = ' ';
             let failed_count = 0;
             codeInfo.forEach(function (item) {
-                if (item.errno === 2 && item.size > 21474836480) { item.errno = 3939; }
                 if (item.errno) {
                     failed_count++;
-                    failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno, item.size)}(#${item.errno})</p>`
+                    failed_info += `<p>文件：${item.path}</p><p>失败原因：${checkErrno(item.errno)}(#${item.errno})</p>`
                 }
             });
             Swal.fire({
@@ -861,7 +834,9 @@
                 break;
             case 2:
                 file.md5 = randomStringTransform(file.md5);
+                break;
             case 3:
+                file.md5 = file.md5.toLowerCase();
                 saveFile_v2(i);
                 return;
             default:
@@ -884,14 +859,16 @@
             codeInfo[i].errno = 114;
         }).always(function () {
             if (codeInfo[i].errno === 404) { saveFile(i, try_flag + 1); }
+            else if (codeInfo[i].errno === 2 && codeInfo[i].size > 21474836480) { saveFile(i, 3); }
             else { saveFile(i + 1, 0); };
         });
     }
 
-    function checkErrno(errno, file_size = 0) {
+    function checkErrno(errno) {
         switch (errno) {
             case -7:
                 return '保存路径存在非法字符';
+            case -6:
             case -8:
                 return '路径下存在同名文件';
             case 400:
@@ -902,9 +879,6 @@
                 return '文件不存在(秒传未生效)';
             case 2:
                 return '转存失败(尝试重新登录网盘账号)';
-            case 3939:
-                return `秒传不支持20G以上的文件,文件大小:${(file_size / (1024 ** 3)).toFixed(2)}G`;
-            //文件大于20G时访问秒传接口实际会返回#2
             case 2333:
                 return '链接内的文件路径错误(不能含有以下字符"\\:*?<>|)';
             //文件路径错误时接口实际也是返回#2
@@ -1049,11 +1023,11 @@
     function saveFile_v2_create(i) {
         let file_info = codeInfo[i];
         $.ajax({
-            url: create_url + bdstoken,
+            url: create_url,
             type: 'POST',
             dataType: 'json',
             data: {
-                block_list: JSON.stringify([file_info.md5.toLowerCase()]),
+                block_list: JSON.stringify([file_info.md5]),
                 uploadid: file_info.uploadid,
                 path: dir + file_info.path,
                 size: file_info.size,
@@ -1069,6 +1043,7 @@
         }).fail(function (r) {
             file_info.errno = 114;
         }).always(function () {
+            if (file_info.errno === 2) { file_info.errno = 404; }
             saveFile(i + 1, 0);
         });
     }
@@ -1080,12 +1055,12 @@
             type: 'POST',
             dataType: 'json',
             data: {
-                block_list: JSON.stringify([file_info.md5.toLowerCase()]),
+                block_list: JSON.stringify([file_info.md5]),
                 path: dir + file_info.path,
                 size: file_info.size,
                 mode: 1,
                 isdir: 0,
-                autoinit: 1,
+                autoinit: 1
             }
         }).success(function (r) {
             if (!r.errno) {
@@ -1130,7 +1105,6 @@
         let style = GM_getResourceText('sweetalert2Css');
         // 暴力猴直接粘贴脚本代码时可能不会将resource中的数据下载缓存，fallback到下载css代码
         let themes = GM_getValue('Themes') || 'Minimal';
-        console.log(themes);
         let css_code = GM_getValue(`1.7.4${themes}`);
         if (css_code) {
             GM_addStyle(css_code);
@@ -1161,7 +1135,7 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.7.9_no_first')) {
+        if (!GM_getValue('1.8.1_no_first')) {
             Swal.fire({
                 title: `秒传链接提取 更新内容`,
                 html: update_info,
@@ -1171,7 +1145,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.7.9_no_first', true);
+                GM_setValue('1.8.1_no_first', true);
             });
         }
     };
@@ -1229,13 +1203,11 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>1.7.9 更新内容(21.6.28):</p>
+        <p>1.8.1 更新内容(21.7.6):</p>
 
         <p><br></p>
 
-        <p>1.大幅提升非会员账号生成秒传的速度</p>
-
-        <p>2.修复生成4G以上文件提示"<span style="color: red;">服务器错误(#500)</span>"的问题</p>
+        <p>支持转存与生成 <span style="color: red;">20G以上</span> 文件的秒传</p>
 
         <p><br></p>
 
@@ -1244,6 +1216,14 @@
         <p><br></p>
 
         <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank"> greasyfork页 </a>反馈</p>
+
+        <p><br></p>
+        
+        <p>1.7.9 更新内容(21.6.28):</p>
+
+        <p>1.大幅提升非会员账号生成秒传的速度</p>
+
+        <p>2.修复生成4G以上文件提示"<span style="color: red;">服务器错误(#500)</span>"的问题</p>
 
         <p><br></p>
 
