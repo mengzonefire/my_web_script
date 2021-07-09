@@ -1,10 +1,14 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.1
+// @version         1.8.2
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
+// @compatible      firefox Tampermonkey
+// @compatible      firefox Violentmonkey
+// @compatible      chrome Violentmonkey
+// @compatible      chrome Tampermonkey
 // @contributionURL https://afdian.net/@mengzonefire
 // @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
@@ -182,10 +186,8 @@
     const html_btn_gen = `<a class="g-button" id="gen-bdlink-button"><span class="g-button-right"><em class="icon icon-share"></em><span class="text" style="width: auto;">生成秒传</span></span></a>`;
     const html_check_md5 = `<p ${myStyle}>测试秒传, 可防止秒传失效<a id="check_md5_btn" ${myBtnStyle}><span class="text" style="width: auto;">测试</span></a></p>`;
     const html_document = `<p ${myStyle}>秒传无效/md5获取失败/防和谐 可参考<a ${myBtnStyle} href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH" rel="noopener noreferrer" target="_blank"><span class="text" style="width: auto;">分享教程</span></a></p>`;
-    const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a ${myStyle2} href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者
-    <a id="kill_donate" ${myBtnStyle}><span style="width: auto;">不再显示</span></a></p>`;
-    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈
-    <a id="kill_feedback" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></a></p>`;
+    const html_donate = `<p id="bdcode_donate" ${myStyle}>若喜欢该脚本, 可前往 <a ${myStyle2} href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者<a id="kill_donate" ${myBtnStyle}><span style="width: auto;">不再显示</span></a></p>`;
+    const html_feedback = `<p id="bdcode_feedback" ${myStyle}>若有任何疑问, 可前往 <a ${myStyle2} href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank">脚本页</a> 反馈<a id="kill_feedback" ${myBtnStyle}><span class="text" style="width: auto;">不再显示</span></a></p>`;
     const csd_hint_html = '<p>弹出跨域访问窗口时,请选择"<span style="color: red;">总是允许</span>"或"<span style="color: red;">总是允许全部</span>"</p><img style="max-width: 100%; height: auto" src="https://pic.rmb.bdstatic.com/bjh/763ff5014cca49237cb3ede92b5b7ac5.png">';
     const html_btn_new = '<a id="bdlink_btn" style="margin-left: 8px;" class="nd-upload-button upload-wrapper"><span class="nd-common-btn nd-file-list-toolbar-action-item u-btn u-btn--primary u-btn--medium u-btn--default is-has-icon"><i class="iconfont inline-block-v-middle icon-copy"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">秒传</span></span> </a>';
     const html_btn_gen_new = '<button id="gen-bdlink-button" class="u-btn nd-common-btn nd-file-list-toolbar-action-item is-need-left-sep u-btn--normal u-btn--medium u-btn--default is-has-icon"> <span><i class="iconfont inline-block-v-middle nd-file-list-toolbar__action-item-icon icon-share"></i><span class="inline-block-v-middle nd-file-list-toolbar-action-item-text">生成秒传</span></span> </button>';
@@ -881,7 +883,6 @@
                 return '转存失败(尝试重新登录网盘账号)';
             case 2333:
                 return '链接内的文件路径错误(不能含有以下字符"\\:*?<>|)';
-            //文件路径错误时接口实际也是返回#2
             case -10:
                 return '网盘容量已满';
             case 114:
@@ -988,7 +989,7 @@
     function Add_content() {
         let content = document.createElement('div')
         let hasAdd = false;
-        if (!GM_getValue('kill_feedback_1.7.8')) {
+        if (!GM_getValue('kill_feedback_1.8.2')) {
             hasAdd = true;
             content.innerHTML += `<p><br></p>`;
             content.innerHTML += html_feedback;
@@ -996,13 +997,13 @@
                 let html_tag = $('#kill_feedback');
                 if (!html_tag.length) return false;
                 $('#kill_feedback').click(function () {
-                    GM_setValue('kill_feedback_1.7.8', true);
+                    GM_setValue('kill_feedback_1.8.2', true);
                     $('#bdcode_feedback').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        if (!GM_getValue('kill_donate_1.7.8')) {
+        if (!GM_getValue('kill_donate_1.8.2')) {
             if (!hasAdd) {
                 content.innerHTML += `<p><br></p>`;
             }
@@ -1011,7 +1012,7 @@
                 var html_tag = $('#kill_donate');
                 if (!html_tag.length) return false;
                 $('#kill_donate').click(function () {
-                    GM_setValue('kill_donate_1.7.8', true);
+                    GM_setValue('kill_donate_1.8.2', true);
                     $('#bdcode_donate').remove();
                 });
                 clearInterval(loop);
