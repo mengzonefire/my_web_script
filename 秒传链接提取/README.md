@@ -1,18 +1,20 @@
-重新上传脚本及原介绍页, 并继续维护
-
 若喜欢该脚本可前往 [![](https://static.afdiancdn.com/favicon.ico) 爱发电](https://afdian.net/@mengzonefire) 支持作者
+
+## 近期通知
+
+* 21.7.9: (<span style="color: red;">重要</span>) 1.8.1版本更换了秒传接口, 解决了绝大部分 "<span style="color: red;">文件不存在(秒传未生效)</span>" 和 "<span style="color: red;">md5获取失败</span>" 的问题, 为保证使用体验, 强烈建议更新到最新版
+
+* 21.6.18: 重新上传脚本及原介绍页, 并继续维护
 
 ## 相关教程
 
-脚本<span style="color: red;"> 不能正常使用 </span>或<span style="color: red;"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
+* 脚本<span style="color: red;"> 不能正常使用 </span>或<span style="color: red;"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
 
-(内含 安卓浏览器 找不到 "电脑版转换" 按钮, 以及 "秒传按钮不显示" 等问题的解决方法)
+* 生成&分享过程中遇到问题, 例如 秒传无效 / md5获取失败 / 文件和谐, 可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
 
-脚本的完整使用教程(包括安装脚本、提取、生成秒传)可参考视频教程：[秒传教程[视频版]](https://www.bilibili.com/video/BV1E5411H76K)
+* 详细的关于 <span style="color: red;">文件和谐</span> 的说明可参考 [防和谐教程](https://shimo.im/docs/DGdDwPwTDhvyq6KX/)
 
-生成&分享过程中遇到问题(例如<span style="color: red;">秒传无效</span>/md5获取失败/<span style="color: red;">文件和谐</span>)可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
-
-详细的关于 <span style="color: red;">文件和谐</span> 的教程可参考 [防和谐教程](https://shimo.im/docs/DGdDwPwTDhvyq6KX/)
+* 脚本的完整使用教程(包含安装、提取、生成), 可参考 [秒传教程[视频版]](https://www.bilibili.com/video/BV1E5411H76K)
 
 ## 脚本说明
 
@@ -20,16 +22,19 @@
 
 * 支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：`https://pan.baidu.com/#bdlink=[参数]`，[参数]为base64加密过的任意格式链接 (支持批量)
 
-PS: 1.7.0版本支持了新版度盘页面, 目前官方未强制跳转新版, 如果要通过一键秒传跳转新版, 则url格式为`https://pan.baidu.com/disk/main#bdlink=[参数]`
+* 支持生成秒传, 选择文件/文件夹后即可看到秒传生成按钮
+
+![](https://pic.rmb.bdstatic.com/bjh/1cb5384f4b7cd3fc5a07b42ef45bfe93.png)
 
 
-## 常见秒传格式示例
+## 常见秒传格式
 
-梦姬标准/标准码: D5AABEFC3290F7A3C09912228B136D0C#821A9F0D27FCD19C80474D2140ED2D85#6467659#test.exe
+<details>
+<summary>点击展开</summary>
 
-PanDL格式: bdpan://dGVzdC5leGV8NjQ2NzY1OXxENUFBQkVGQzMyOTBGN0EzQzA5OTEyMjI4QjEzNkQwQ3w4MjFBOUYwRDI3RkNEMTlDODA0NzREMjE0MEVEMkQ4NQ==
+<ul><li><p>梦姬标准/标准码: D5AABEFC3290F7A3C09912228B136D0C#821A9F0D27FCD19C80474D2140ED2D85#6467659#test.exe</p></li><li><p>PanDL格式: bdpan://dGVzdC5leGV8NjQ2NzY1OXxENUFBQkVGQzMyOTBGN0EzQzA5OTEyMjI4QjEzNkQwQ3w4MjFBOUYwRDI3RkNEMTlDODA0NzREMjE0MEVEMkQ4NQ==</p></li><li><p>PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C09912228B136D0C -slicemd5=821A9F0D27FCD19C80474D2140ED2D85 &quot;/test.exe&quot;</p></li></ul>
 
-PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C09912228B136D0C -slicemd5=821A9F0D27FCD19C80474D2140ED2D85 "/test.exe"
+</details>
 
 ## 常见问题
 
@@ -42,7 +47,7 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 2. 支持 新版度盘页面 下的 "生成秒传" 功能
 3. ~~修复设置为非默认主题时, 窗口内会出现警告标识的问题~~ (完成, 实际为主题包不适配旧版sweetalert2)
 
-## 更新历史
+## 更新说明
 
 21.7.6更新: 支持转存与生成 <span style="color: red;">20G以上</span> 文件的秒传
 
@@ -54,58 +59,59 @@ PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C0991
 
 21.6.25更新：修复了绝大部分转存提示 "<span style="color: red;">文件不存在(秒传未生效)(#404)</span>" 的问题
 
-21.6.24更新：修复从yun.baidu.com进入时, 弹窗提示 "bdskoten获取失败" 的问题
+<details>
+<summary>历史更新 [点击展开]</summary>
 
-21.6.23更新：将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)
+<p>21.6.24更新：修复从yun.baidu.com进入时, 弹窗提示 &quot;bdskoten获取失败&quot; 的问题</p>
 
-21.6.18更新：转存秒传添加bdstoken参数, 防止报错"转存失败(#2)", 并支持了新版度盘页面下的转存功能:
+<p>21.6.23更新：将sweetalert2和设置内的主题包升级到最新版(适配主题后修复了 待更新#3)</p>
 
-![](https://pic.rmb.bdstatic.com/bjh/ed9647f2c8d16a8a6fb74d42e51626cf.png)
+<p>21.6.18更新：转存秒传添加bdstoken参数, 防止报错&quot;转存失败(#2)&quot;, 并支持了新版度盘页面下的转存功能:</p>
 
-21.6.18更新：移除<span style="color: rgb(209, 72, 65);"> 修复下载 </span>功能(已在21年4月上旬失效), 后续不会再考虑修复该功能
+<p><img alt="" src="https://pic.rmb.bdstatic.com/bjh/ed9647f2c8d16a8a6fb74d42e51626cf.png"/></p>
 
-21.3.30更新：修复部分秒传转存提示 "文件不存在" 或 "md5不匹配", 有该情况的请务必更新到1.6.7版本
+<p>21.6.18更新：移除<span style="color: red;"> 修复下载 </span>功能(已在21年4月上旬失效), 后续不会再考虑修复该功能</p>
 
-21.3.29更新：新增<span style="color: rgb(209, 72, 65);"> 直接修复下载 </span>功能，无需秒传即可修复下载，感谢TkzcM的帮助
+<p>21.3.30更新：修复部分秒传转存提示 &quot;文件不存在&quot; 或 &quot;md5不匹配&quot;, 有该情况的请务必更新到1.6.7版本</p>
 
-<span style="color: rgb(184, 49, 47);">注意:</span> 后续测试发现1.6.1和1.6.2版本该功能有可能使原文件丢失, 若需要使用该功能请务必更新到1.6.3以上版本
+<p>21.3.29更新：新增<span style="color: red;"> 直接修复下载 </span>功能，无需秒传即可修复下载，感谢TkzcM的帮助</p>
 
-<span style="color: rgb(184, 49, 47);">注意2:&nbsp;</span><span style="color: rgb(0, 0, 0);">由于实现机制不同, "直接修复" 的成功率相对 "转存的修复" 较低, 至少一半以上的文件无法修复(弹窗提示 "不支持修复"), 目前暂时未找到解决方法</span>
+<p><span style="color: red;">注意:</span> 后续测试发现1.6.1和1.6.2版本该功能有可能使原文件丢失, 若需要使用该功能请务必更新到1.6.3以上版本</p>
 
-![](https://pic.rmb.bdstatic.com/bjh/5e05f7c1f772451b8efce938280bcaee.png)
+<p><span style="color: red;">注意2:</span> 由于实现机制不同, &quot;直接修复&quot; 的成功率相对 &quot;转存的修复&quot; 较低, 至少一半以上的文件无法修复(弹窗提示 &quot;不支持修复&quot;), 目前暂时未找到解决方法</p>
 
-21.3.16更新：秒传转存新增<span style="color: rgb(209, 72, 65);"> 修复下载 </span>功能，可修复绝大部分无法下载的文件 (需有秒传链接并在转存时勾选修复选项)
+<p><img alt="" src="https://pic.rmb.bdstatic.com/bjh/5e05f7c1f772451b8efce938280bcaee.png"/></p>
 
-![](https://pic.rmb.bdstatic.com/bjh/822bf85e8b663f352c65f04a50a305e1.png)
+<p>21.3.16更新：秒传转存新增<span style="color: red;"> 修复下载 </span>功能，可修复绝大部分无法下载的文件 (需有秒传链接并在转存时勾选修复选项)</p>
 
-21.2.26更新：若在更新1.5.0版本后出现秒传按钮不显示的问题, 请尝试更新到1.5.5版本
+<p><img alt="" src="https://pic.rmb.bdstatic.com/bjh/822bf85e8b663f352c65f04a50a305e1.png"/></p>
 
-21.2.11更新：[分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/) 更新, 原教程的 "固实压缩+加密文件名" 已无法再防和谐(在度盘移动端依旧可以在线解压), 目前有效的防和谐方法请参考教程内的 "双层压缩"
+<p>21.2.26更新：若在更新1.5.0版本后出现秒传按钮不显示的问题, 请尝试更新到1.5.5版本</p>
 
-21.1.28更新：兼容了暴力猴插件, 添加更换主题功能, 优化部分代码逻辑
+<p>21.2.11更新：<a href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH/">分享教程</a> 更新, 原教程的 &quot;固实压缩+加密文件名&quot; 已无法再防和谐(在度盘移动端依旧可以在线解压), 目前有效的防和谐方法请参考教程内的 &quot;<span style="color: red;">双层压缩</span>&quot;</p>
 
-21.1.11更新：若1.4.0版本出现 "转存失败" 的情况, 请更新1.4.4版本
+<p>21.1.28更新：兼容了暴力猴插件, 添加更换主题功能, 优化部分代码逻辑</p>
 
-20.12.18更新：不再支持暴力猴violentmonkey2.12.8以上插件, 使用该插件的用户请降级插件或改用油猴插件Tampermonkey
+<p>21.1.11更新：若1.4.0版本出现 &quot;转存失败&quot; 的情况, 请更新1.4.4版本</p>
 
-若使用1.3.5版本时出现一键秒传(解base64)不可用的情况, 请将脚本更新至1.3.6以上
+<p>20.12.18更新：不再支持暴力猴violentmonkey2.12.8以上插件, 使用该插件的用户请降级插件或改用油猴插件Tampermonkey</p>
 
-20.11.12更新：若1.2.9版本出现秒传按钮不显示的情况, 请更新1.3.0版本
+<p>若使用1.3.5版本时出现一键秒传(解base64)不可用的情况, 请将脚本更新至1.3.6以上</p>
 
-20.11.5更新：若出现转存时路径留空转存无反应的情况, 请更新1.2.7版本
+<p>20.11.12更新：若1.2.9版本出现秒传按钮不显示的情况, 请更新1.3.0版本</p>
 
-20.11.2更新：1.2.4版本加入了生成秒传的功能,选择文件/文件夹后即可看到秒传生成按钮
+<p>20.11.5更新：若出现转存时路径留空转存无反应的情况, 请更新1.2.7版本</p>
 
-![](https://i.loli.net/2020/11/02/7xcdAZh94igmvCt.png)
+<p>20.11.2更新：</p>
 
-另外还增加了跳转目录的功能,若在秒传转存时有输入保存路径, 转存完成后可以看到跳转按钮
+<ol><li><p>加入了生成秒传的功能, 选择文件/文件夹后即可看到秒传生成按钮</p></li><li><p>增加了跳转目录的功能, 若在秒传转存时有输入保存路径, 转存完成后可以看到跳转按钮</p></li></ol>
 
-![](https://i.loli.net/2020/11/02/zTnpl6WCxqmEH1t.png)
+</details>
 
 ## 秒传链接的获取方式
 
-1. [PanDL格式]</span> 的链接可以在PandownDownLoad（Win版）生成，需要在度盘中存有文件
+1. 使用脚本自带的生成功能, 选中文件/文件夹, 再点击 "生成秒传"
 
-2. [梦姬标准格式]请前往 [蓝奏云 密码:ab2f](https://wwe.lanzoui.com/b01u0yqvi) 获取生成工具，本地生成，但需要上传过文件到度盘才能使其生效
+2. 本地秒传生成工具 [蓝奏云 密码:ab2f](https://wwe.lanzoui.com/b01u0yqvi)
 
-3. 使用脚本自带的生成功能生成[梦姬标准格式]：选中文件/文件夹, 再点击 "生成秒传" 即可
+*需要任意账号的网盘中存有至少一份文件才能保证秒传链接的有效性
