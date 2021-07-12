@@ -2,6 +2,12 @@
 
 ## 近期通知
 
+* 21.7.12: 经测试, 度盘服务器已恢复正常, 可以正常上传文件并生成秒传.
+
+* 21.7.10: ~~(<span style="color: red;">重要</span>) 从7.9开始, 新上传网盘的文件<span style="color: red;">很可能</span>出现 "秒传未生效", "md5获取失败"的问题, 疑似百度服务器异常, 正在尝试修复.~~
+
+    *[分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/) 内提供了临时的解决方法
+
 * 21.7.9: (<span style="color: red;">重要</span>) 1.8.1版本更换了秒传接口, 解决了绝大部分 "<span style="color: red;">文件不存在(秒传未生效)</span>" 和 "<span style="color: red;">md5获取失败</span>" 的问题, 为保证使用体验, 强烈建议更新到最新版
 
 * 21.6.18: 重新上传脚本及原介绍页, 并继续维护
