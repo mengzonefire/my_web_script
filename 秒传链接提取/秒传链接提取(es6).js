@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.2
+// @version         1.8.3
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -362,15 +362,16 @@
     };
 
     function initButtonHome() {
+        let tag1, tag2, my_html_btn;
         if (new_flag) {
-            var tag1 = 'div.nd-file-list-toolbar__actions';
-            var tag2 = 'a.nd-upload-button';
-            var my_html_btn = html_btn_new;
+            tag1 = 'div.nd-file-list-toolbar__actions';
+            tag2 = 'a.nd-upload-button';
+            my_html_btn = html_btn_new;
         }
         else {
-            var tag1 = 'div.tcuLAu';
-            var tag2 = '#h5Input0';
-            var my_html_btn = html_btn;
+            tag1 = 'div.tcuLAu';
+            tag2 = '#h5Input0';
+            my_html_btn = html_btn;
         }
         let loop_count = 0;
         let loop = setInterval(() => {
@@ -551,6 +552,7 @@
                     return;
                 }
                 let r_json = JSON.parse(r.response);
+                // console.log(r_json.list[0]);
                 let fs_id = r_json.list[0].fs_id;
                 let md5 = r_json.list[0].md5.match(/[\dA-Fa-f]{32}/);
                 if (md5) { file_info.md5 = md5[0].toLowerCase(); }
@@ -599,6 +601,7 @@
                 if (parseInt(r.status / 100) === 2) {
                     let responseHeaders = r.responseHeaders;
                     if (!file_info.md5) {
+                        // console.log(responseHeaders);
                         let file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
                         if (file_md5) {
                             file_info.md5 = file_md5[1].toLowerCase();

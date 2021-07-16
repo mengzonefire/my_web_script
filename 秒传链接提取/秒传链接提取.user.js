@@ -1,21 +1,124 @@
 "use strict";
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) {
+      symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+    }
+    keys.push.apply(keys, symbols);
+  }
+  return keys;
+}
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+  return target;
+}
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
 
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) {
+  var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"];
+  if (!it) {
+    if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+      if (it) o = it;
+      var i = 0;
+      var F = function F() {};
+      return {
+        s: F,
+        n: function n() {
+          if (i >= o.length) return {
+            done: true
+          };
+          return {
+            done: false,
+            value: o[i++]
+          };
+        },
+        e: function e(_e) {
+          throw _e;
+        },
+        f: F
+      };
+    }
+    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+  var normalCompletion = true,
+    didErr = false,
+    err;
+  return {
+    s: function s() {
+      it = it.call(o);
+    },
+    n: function n() {
+      var step = it.next();
+      normalCompletion = step.done;
+      return step;
+    },
+    e: function e(_e2) {
+      didErr = true;
+      err = _e2;
+    },
+    f: function f() {
+      try {
+        if (!normalCompletion && it["return"] != null) it["return"]();
+      } finally {
+        if (didErr) throw err;
+      }
+    }
+  };
+}
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
 
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.2
+// @version         1.8.3
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -43,7 +146,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 // @run-at          document-start
 // @connect         *
 // ==/UserScript==
-!function () {
+! function () {
   'use strict';
 
   var rapid_url = '/api/rapidupload';
@@ -63,20 +166,20 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   };
   var css_checkbox = "input[type='checkbox'],\n    input[type='radio'] {\n      --active: #275EFE;\n      --active-inner: #fff;\n      --focus: 2px rgba(39, 94, 254, .3);\n      --border: #BBC1E1;\n      --border-hover: #275EFE;\n      --background: #fff;\n      --disabled: #F6F8FF;\n      --disabled-inner: #E1E6F9;\n      -webkit-appearance: none;\n      -moz-appearance: none;\n      height: 21px;\n      outline: none;\n      display: inline-block;\n      vertical-align: top;\n      position: relative;\n      margin: 0;\n      cursor: pointer;\n      border: 1px solid var(--bc, var(--border));\n      background: var(--b, var(--background));\n      -webkit-transition: background .3s, border-color .3s, box-shadow .2s;\n      transition: background .3s, border-color .3s, box-shadow .2s;\n    }\n    input[type='checkbox']:after,\n    input[type='radio']:after {\n      content: '';\n      display: block;\n      left: 0;\n      top: 0;\n      position: absolute;\n      -webkit-transition: opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n      transition: opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n      transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s);\n      transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s), -webkit-transform var(--d-t, 0.3s) var(--d-t-e, ease);\n    }\n    input[type='checkbox']:checked,\n    input[type='radio']:checked {\n      --b: var(--active);\n      --bc: var(--active);\n      --d-o: .3s;\n      --d-t: .6s;\n      --d-t-e: cubic-bezier(.2, .85, .32, 1.2);\n    }\n    input[type='checkbox']:disabled,\n    input[type='radio']:disabled {\n      --b: var(--disabled);\n      cursor: not-allowed;\n      opacity: .9;\n    }\n    input[type='checkbox']:disabled:checked,\n    input[type='radio']:disabled:checked {\n      --b: var(--disabled-inner);\n      --bc: var(--border);\n    }\n    input[type='checkbox']:disabled + label,\n    input[type='radio']:disabled + label {\n      cursor: not-allowed;\n    }\n    input[type='checkbox']:hover:not(:checked):not(:disabled),\n    input[type='radio']:hover:not(:checked):not(:disabled) {\n      --bc: var(--border-hover);\n    }\n    input[type='checkbox']:focus,\n    input[type='radio']:focus {\n      box-shadow: 0 0 0 var(--focus);\n    }\n    input[type='checkbox']:not(.switch),\n    input[type='radio']:not(.switch) {\n      width: 21px;\n    }\n    input[type='checkbox']:not(.switch):after,\n    input[type='radio']:not(.switch):after {\n      opacity: var(--o, 0);\n    }\n    input[type='checkbox']:not(.switch):checked,\n    input[type='radio']:not(.switch):checked {\n      --o: 1;\n    }\n    input[type='checkbox'] + label,\n    input[type='radio'] + label {\n      font-size: 18px;\n      line-height: 21px;\n      display: inline-block;\n      vertical-align: top;\n      cursor: pointer;\n      margin-left: 4px;\n    }\n\n    input[type='checkbox']:not(.switch) {\n      border-radius: 7px;\n    }\n    input[type='checkbox']:not(.switch):after {\n      width: 5px;\n      height: 9px;\n      border: 2px solid var(--active-inner);\n      border-top: 0;\n      border-left: 0;\n      left: 7px;\n      top: 4px;\n      -webkit-transform: rotate(var(--r, 20deg));\n              transform: rotate(var(--r, 20deg));\n    }\n    input[type='checkbox']:not(.switch):checked {\n      --r: 43deg;\n    }\n    input[type='checkbox'].switch {\n      width: 38px;\n      border-radius: 11px;\n    }\n    input[type='checkbox'].switch:after {\n      left: 2px;\n      top: 2px;\n      border-radius: 50%;\n      width: 15px;\n      height: 15px;\n      background: var(--ab, var(--border));\n      -webkit-transform: translateX(var(--x, 0));\n              transform: translateX(var(--x, 0));\n    }\n    input[type='checkbox'].switch:checked {\n      --ab: var(--active-inner);\n      --x: 17px;\n    }\n    input[type='checkbox'].switch:disabled:not(:checked):after {\n      opacity: .6;\n    }";
   var check_mode = false,
-      new_flag = false,
-      file_info_list = [],
-      gen_success_list = [],
-      dir,
-      file_num,
-      gen_num,
-      gen_prog,
-      codeInfo,
-      recursive,
-      bdcode,
-      xmlhttpRequest,
-      select_list,
-      bdstoken,
-      interval;
+    new_flag = false,
+    file_info_list = [],
+    gen_success_list = [],
+    dir,
+    file_num,
+    gen_num,
+    gen_prog,
+    codeInfo,
+    recursive,
+    bdcode,
+    xmlhttpRequest,
+    select_list,
+    bdstoken,
+    interval;
   var myStyle = "style='width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;'";
   var myStyle2 = "style='color: #09AAFF;'";
   var myBtnStyle = "style='font-size: 15px;color: #09AAFF;border: 2px solid #C3EAFF;border-radius: 4px;padding: 10px;margin: 0 5px;padding-top: 5px;padding-bottom: 5px; cursor: pointer'";
@@ -116,7 +219,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     var tempString = [];
 
     var _iterator = _createForOfIteratorHelper(string),
-        _step;
+      _step;
 
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
@@ -282,14 +385,16 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
   ;
 
   function initButtonHome() {
+    var tag1, tag2, my_html_btn;
+
     if (new_flag) {
-      var tag1 = 'div.nd-file-list-toolbar__actions';
-      var tag2 = 'a.nd-upload-button';
-      var my_html_btn = html_btn_new;
+      tag1 = 'div.nd-file-list-toolbar__actions';
+      tag2 = 'a.nd-upload-button';
+      my_html_btn = html_btn_new;
     } else {
-      var tag1 = 'div.tcuLAu';
-      var tag2 = '#h5Input0';
-      var my_html_btn = html_btn;
+      tag1 = 'div.tcuLAu';
+      tag2 = '#h5Input0';
+      my_html_btn = html_btn;
     }
 
     var loop_count = 0;
@@ -300,7 +405,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
       if (loop_count > 40) {
         html_tag.append(my_html_btn);
-      } else if (!$(tag2).length) return false;else html_tag.append(my_html_btn);
+      } else if (!$(tag2).length) return false;
+      else html_tag.append(my_html_btn);
 
       var loop2 = setInterval(function () {
         var btn_tag = $('#bdlink_btn');
@@ -482,7 +588,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           return;
         }
 
-        var r_json = JSON.parse(r.response);
+        var r_json = JSON.parse(r.response); // console.log(r_json.list[0]);
+
         var fs_id = r_json.list[0].fs_id;
         var md5 = r_json.list[0].md5.match(/[\dA-Fa-f]{32}/);
 
@@ -538,6 +645,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           var responseHeaders = r.responseHeaders;
 
           if (!file_info.md5) {
+            // console.log(responseHeaders);
             var file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
 
             if (file_md5) {
