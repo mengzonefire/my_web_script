@@ -2,15 +2,21 @@
 
 ## 近期通知
 
-* 21.7.12: 经测试, 度盘服务器已恢复正常, 可以正常上传文件并生成秒传.
+* 21.7.17: 
 
-* 21.7.10: ~~(<span style="color: red;">重要</span>) 从7.9开始, 新上传网盘的文件<span style="color: red;">很可能</span>出现 "秒传未生效", "md5获取失败"的问题, 疑似百度服务器异常, 正在尝试修复.~~
+    - 管理员已完成对昨日举报的审核[(图1)](https://pic.rmb.bdstatic.com/bjh/a6abf0daa40362c10385432fb5150ae7.png), 脚本页现可正常访问了
 
-    *[分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/) 内提供了临时的解决方法
+    - 鉴于 [阿里云盘](https://www.aliyundrive.com/drive/) 有更稳定的服务端(不存在"秒传无效", "md5获取失败"等问题), 即将着手阿里云盘对应的秒传提取&生成功能, 预计下个月更新.
 
-* 21.7.9: (<span style="color: red;">重要</span>) 1.8.1版本更换了秒传接口, 解决了绝大部分 "<span style="color: red;">文件不存在(秒传未生效)</span>" 和 "<span style="color: red;">md5获取失败</span>" 的问题, 为保证使用体验, 强烈建议更新到最新版
+* 21.7.16: 估计是因为脚本头几行留有babel工具生成的语法转换代码[(图1)](https://pic.rmb.bdstatic.com/bjh/9cd999f1d1a35b350e83f93fc685dee7.png), 被人误解为压缩代码举报了[(图2)](https://pic.rmb.bdstatic.com/bjh/eb18b94af7dacd00b11e8cbac3b1e1e4.png), 故将源码重新格式化了一遍[(图3)](https://pic.rmb.bdstatic.com/bjh/ecc36a94f8632b8fba81594d37646b31.png)以避免误解.
 
-* 21.6.18: 重新上传脚本及原介绍页, 并继续维护
+<details>
+<summary>历史通知</summary>
+
+<ul><li><p>21.7.12: 经测试, 度盘服务器已恢复正常, 可以正常上传文件并生成秒传.</p></li><li><p>21.7.10: (<span style="color: red;"> 重要 </span>) 从7.9开始, 新上传网盘的文件<span style="color: red;"> 很可能 </span>出现 &quot;秒传未生效&quot;, &quot;md5获取失败&quot;的问题, 疑似百度服务器异常, 正在尝试修复.</p><p>*<a href="https://shimo.im/docs/TZ1JJuEjOM0wnFDH/">分享教程</a> 内提供了临时的解决方法</p></li><li><p>21.7.9: (<span style="color: red;"> 重要 </span>) 1.8.1版本更换了秒传接口, 解决了绝大部分 &quot;<span style="color: red;"> 文件不存在(秒传未生效) </span>&quot; 和 &quot;<span style="color: red;"> md5获取失败 </span>&quot; 的问题, 为保证使用体验, 强烈建议更新到最新版</p></li></ul>
+
+</details>
+
 
 ## 相关教程
 
@@ -49,9 +55,10 @@
 1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: red;">不兼容</span>油猴子Greasemonkey
 
 ## 待更新
-1. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
-2. 支持 新版度盘页面 下的 "生成秒传" 功能
-3. ~~修复设置为非默认主题时, 窗口内会出现警告标识的问题~~ (完成, 实际为主题包不适配旧版sweetalert2)
+1. 支持 新版度盘页面 下的 "生成秒传" 功能
+2. 支持 [阿里云盘](https://www.aliyundrive.com/drive/) 的秒传提取&生成
+3. ~~支持 [新版度盘页面](https://pan.baidu.com/disk/main?from=oldversion#/index)~~ (完成)
+4. ~~修复设置为非默认主题时, 窗口内会出现警告标识的问题~~ (完成, 实际为主题包不适配旧版sweetalert2)
 
 ## 更新说明
 
