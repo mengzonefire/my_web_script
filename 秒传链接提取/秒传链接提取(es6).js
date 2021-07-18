@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.3
+// @version         1.8.4
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -38,6 +38,7 @@
     const api_url = '/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000';
     const meta_url2 = '/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=';
     const meta_url = 'http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=';
+    const pcs_url = 'https://pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=download';
     const css_url = {
         'Minimal': 'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
         'Dark': 'https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css',
@@ -207,7 +208,9 @@
     }
     if (Base64.extendString) {
         Base64.extendString();
-    } else { alert('秒传链接提取:\n外部资源加载错误, 脚本无法运行, 请尝试刷新页面'); }
+    } else {
+        alert('秒传链接提取:\n外部资源加载错误, 脚本无法运行, 请尝试刷新页面');
+    }
 
     function randomStringTransform(string) {
         if (typeof string !== 'string') return false
@@ -367,8 +370,7 @@
             tag1 = 'div.nd-file-list-toolbar__actions';
             tag2 = 'a.nd-upload-button';
             my_html_btn = html_btn_new;
-        }
-        else {
+        } else {
             tag1 = 'div.tcuLAu';
             tag2 = '#h5Input0';
             my_html_btn = html_btn;
@@ -380,8 +382,7 @@
             loop_count++;
             if (loop_count > 40) {
                 html_tag.append(my_html_btn);
-            }
-            else if (!$(tag2).length) return false;
+            } else if (!$(tag2).length) return false;
             else html_tag.append(my_html_btn);
             let loop2 = setInterval(() => {
                 let btn_tag = $('#bdlink_btn');
@@ -402,8 +403,7 @@
     function initButtonGen() {
         if (new_flag) {
 
-        }
-        else {
+        } else {
             var listTools = getSystemContext().Broker.getButtonBroker('listTools');
             if (listTools && listTools.$box) {
                 $(listTools.$box).children('div').after(html_btn_gen);
@@ -509,7 +509,9 @@
                     let loop = setInterval(() => {
                         var html_tag = $('#check_md5_btn');
                         if (!html_tag.length) return false;
-                        $('#check_md5_btn').click(function () { test_bdlink(); });
+                        $('#check_md5_btn').click(function () {
+                            test_bdlink();
+                        });
                         clearInterval(loop);
                     }, 50);
                     Add_content();
@@ -552,29 +554,38 @@
                     return;
                 }
                 let r_json = JSON.parse(r.response);
-                // console.log(r_json.list[0]);
-                let fs_id = r_json.list[0].fs_id;
+                console.log(r_json.list[0]);
+                file_info.fs_id = r_json.list[0].fs_id;
                 let md5 = r_json.list[0].md5.match(/[\dA-Fa-f]{32}/);
-                if (md5) { file_info.md5 = md5[0].toLowerCase(); }
-                let get_dl_par = {
-                    url: meta_url2 + JSON.stringify([fs_id]),
-                    dataType: 'json',
-                    type: 'GET',
-                    onerror: function (r) {
-                        file_info.errno = 514;
-                        myGenerater(file_id + 1);
-                    },
-                    onload: function (r) {
-                        let r_json = JSON.parse(r.response);
-                        if (r_json.errno) {
-                            file_info.errno = r_json.errno;
-                            myGenerater(file_id + 1);
-                            return;
-                        }
-                        download_file_data(file_id, r_json.list[0].dlink);
-                    }
-                };
-                GM_xmlhttpRequest(get_dl_par);
+                if (md5) {
+                    file_info.md5 = md5[0].toLowerCase();
+                } else if (r_json.list[0].block_list.length === 1) {
+                    file_info.md5 = r_json.list[0].block_list[0].toLowerCase();
+                }
+                get_file_md5(file_id)
+            }
+        };
+        GM_xmlhttpRequest(get_dl_par);
+    }
+
+    function get_file_md5(file_id) {
+        let file_info = file_info_list[file_id];
+        let get_dl_par = {
+            url: meta_url2 + JSON.stringify([file_info.fs_id]),
+            dataType: 'json',
+            type: 'GET',
+            onerror: function (r) {
+                file_info.errno = 514;
+                myGenerater(file_id + 1);
+            },
+            onload: function (r) {
+                let r_json = JSON.parse(r.response);
+                if (r_json.errno) {
+                    file_info.errno = r_json.errno;
+                    myGenerater(file_id + 1);
+                    return;
+                }
+                download_file_data(file_id, r_json.list[0].dlink);
             }
         };
         GM_xmlhttpRequest(get_dl_par);
@@ -597,39 +608,48 @@
                 myGenerater(file_id + 1);
             },
             onload: function (r) {
-                // console.log(`dl_url: ${r.finalUrl}`);
-                if (parseInt(r.status / 100) === 2) {
-                    let responseHeaders = r.responseHeaders;
-                    if (!file_info.md5) {
-                        // console.log(responseHeaders);
-                        let file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
-                        if (file_md5) {
-                            file_info.md5 = file_md5[1].toLowerCase();
-                        } else {
-                            file_info.errno = 996;
-                            myGenerater(file_id + 1);
-                            return;
-                        }
-                    }
-                    if (r.finalUrl.indexOf('issuecdn.baidupcs.com') !== -1) {
-                        file_info.errno = 1919;
-                    } else {
-                        let spark = new SparkMD5.ArrayBuffer();
-                        spark.append(r.response);
-                        let slice_md5 = spark.end();
-                        file_info.md5s = slice_md5;
-                    }
-                    gen_prog.textContent = '100%';
-                    setTimeout(function () {
-                        myGenerater(file_id + 1);
-                    }, interval);
-                } else {
-                    file_info.errno = r.status;
-                    myGenerater(file_id + 1);
-                }
+                parse_download_data(r, file_id);
             }
         };
         xmlhttpRequest = GM_xmlhttpRequest(get_dl_par);
+    }
+
+    function parse_download_data(r, file_id) {
+        console.log(`dl_url: ${r.finalUrl}`);
+        let file_info = file_info_list[file_id];
+        gen_prog.textContent = '100%';
+        if (parseInt(r.status / 100) === 2) {
+            let responseHeaders = r.responseHeaders;
+            if (!file_info.md5) {
+                console.log(responseHeaders);
+                let file_md5 = responseHeaders.match(/content-md5: ([\da-f]{32})/i);
+                if (file_md5) {
+                    file_info.md5 = file_md5[1].toLowerCase();
+                } else if (file_info.size <= 3900000000 && !file_info.retry_996) {
+                    file_info.retry_996 = true;
+                    download_file_data(file_id, pcs_url + `&path=${encodeURIComponent(file_info.path)}`);
+                    return;
+                } else {
+                    file_info.errno = 996;
+                    myGenerater(file_id + 1);
+                    return;
+                }
+            }
+            if (r.finalUrl.indexOf('issuecdn.baidupcs.com') !== -1) {
+                file_info.errno = 1919;
+            } else {
+                let spark = new SparkMD5.ArrayBuffer();
+                spark.append(r.response);
+                let slice_md5 = spark.end();
+                file_info.md5s = slice_md5;
+            }
+            setTimeout(function () {
+                myGenerater(file_id + 1);
+            }, interval);
+        } else {
+            file_info.errno = r.status;
+            myGenerater(file_id + 1);
+        }
     }
 
     /**
@@ -679,7 +699,7 @@
         return Array.prototype.slice.call(this.buf, index, index + size).map(SimpleBuffer.toStdHex).join('');
     };
 
-    function DuParser() { }
+    function DuParser() {}
 
     DuParser.parse = function generalDuCodeParse(szUrl) {
         let r;
@@ -796,7 +816,9 @@
                     Add_content();
                     var _dir = (dir || '').replace(/\/$/, '');
                     if (_dir) {
-                        if (_dir.charAt(0) !== '/') { _dir = '/' + _dir; }
+                        if (_dir.charAt(0) !== '/') {
+                            _dir = '/' + _dir;
+                        }
                         const cBtn = Swal.getConfirmButton();
                         const btn = cBtn.cloneNode();
                         btn.textContent = '打开目录';
@@ -823,8 +845,11 @@
                     GM_deleteValue('unfinish');
                     check_mode = false;
                 }
-                if (new_flag) { location.reload(); }
-                else { require('system-core:system/baseService/message/message.js').trigger('system-refresh'); }
+                if (new_flag) {
+                    location.reload();
+                } else {
+                    require('system-core:system/baseService/message/message.js').trigger('system-refresh');
+                }
             });
             return;
         }
@@ -858,14 +883,21 @@
                 'content-length': file.size
             }
         }).success(function (r) {
-            if (file.path.match(/["\\\:*?<>|]/)) { codeInfo[i].errno = 2333; }
-            else { codeInfo[i].errno = r.errno; }
+            if (file.path.match(/["\\\:*?<>|]/)) {
+                codeInfo[i].errno = 2333;
+            } else {
+                codeInfo[i].errno = r.errno;
+            }
         }).fail(function (r) {
             codeInfo[i].errno = 114;
         }).always(function () {
-            if (codeInfo[i].errno === 404) { saveFile(i, try_flag + 1); }
-            else if (codeInfo[i].errno === 2 && codeInfo[i].size > 21474836480) { saveFile(i, 3); }
-            else { saveFile(i + 1, 0); };
+            if (codeInfo[i].errno === 404) {
+                saveFile(i, try_flag + 1);
+            } else if (codeInfo[i].errno === 2 && codeInfo[i].size > 21474836480) {
+                saveFile(i, 3);
+            } else {
+                saveFile(i + 1, 0);
+            };
         });
     }
 
@@ -915,15 +947,24 @@
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputValidator: (value) => {
-                if (!value) { return '链接不能为空'; }
-                if (value === 'setting') { return; }
+                if (!value) {
+                    return '链接不能为空';
+                }
+                if (value === 'setting') {
+                    return;
+                }
                 codeInfo = DuParser.parse(value);
-                if (!codeInfo.length) { return '未识别到正确的链接'; }
+                if (!codeInfo.length) {
+                    return '未识别到正确的链接';
+                }
             }
         }).then((result) => {
             if (!result.dismiss) {
-                if (result.value === 'setting') { setting(); }
-                else { Process(); }
+                if (result.value === 'setting') {
+                    setting();
+                } else {
+                    Process();
+                }
             }
         });
     }
@@ -992,7 +1033,7 @@
     function Add_content() {
         let content = document.createElement('div')
         let hasAdd = false;
-        if (!GM_getValue('kill_feedback_1.8.2')) {
+        if (!GM_getValue('kill_feedback_1.8.4')) {
             hasAdd = true;
             content.innerHTML += `<p><br></p>`;
             content.innerHTML += html_feedback;
@@ -1000,13 +1041,13 @@
                 let html_tag = $('#kill_feedback');
                 if (!html_tag.length) return false;
                 $('#kill_feedback').click(function () {
-                    GM_setValue('kill_feedback_1.8.2', true);
+                    GM_setValue('kill_feedback_1.8.4', true);
                     $('#bdcode_feedback').remove();
                 });
                 clearInterval(loop);
             }, 50);
         }
-        if (!GM_getValue('kill_donate_1.8.2')) {
+        if (!GM_getValue('kill_donate_1.8.4')) {
             if (!hasAdd) {
                 content.innerHTML += `<p><br></p>`;
             }
@@ -1015,7 +1056,7 @@
                 var html_tag = $('#kill_donate');
                 if (!html_tag.length) return false;
                 $('#kill_donate').click(function () {
-                    GM_setValue('kill_donate_1.8.2', true);
+                    GM_setValue('kill_donate_1.8.4', true);
                     $('#bdcode_donate').remove();
                 });
                 clearInterval(loop);
@@ -1047,7 +1088,9 @@
         }).fail(function (r) {
             file_info.errno = 114;
         }).always(function () {
-            if (file_info.errno === 2) { file_info.errno = 404; }
+            if (file_info.errno === 2) {
+                file_info.errno = 404;
+            }
             saveFile(i + 1, 0);
         });
     }
@@ -1069,13 +1112,16 @@
         }).success(function (r) {
             if (!r.errno) {
                 // 若返回的block_list非空则表示不识别该md5(#404)
-                if (r.block_list.length) { file_info.errno = 404; }
-                else if (r.uploadid) {
+                if (r.block_list.length) {
+                    file_info.errno = 404;
+                } else if (r.uploadid) {
                     file_info.uploadid = r.uploadid;
                     saveFile_v2_create(i);
                     return;
                 }
-            } else { file_info.errno = r.errno; }
+            } else {
+                file_info.errno = r.errno;
+            }
             saveFile(i + 1, 0);
         }).fail(function (r) {
             file_info.errno = 114;
@@ -1139,7 +1185,7 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.8.1_no_first')) {
+        if (!GM_getValue('1.8.4_no_first')) {
             Swal.fire({
                 title: `秒传链接提取 更新内容`,
                 html: update_info,
@@ -1149,7 +1195,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.8.1_no_first', true);
+                GM_setValue('1.8.4_no_first', true);
             });
         }
     };
@@ -1207,20 +1253,22 @@
         `<div class="panel-body" style="height: 250px; overflow-y:scroll">
         <div style="border: 1px  #000000; width: 100%; margin: 0 auto;"><span>
 
-        <p>1.8.1 更新内容(21.7.6):</p>
-
-        <p><br></p>
-
-        <p>支持转存与生成 <span style="color: red;">20G以上</span> 文件的秒传</p>
-
-        <p><br></p>
-
         <p>若喜欢该脚本可前往 <a href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者</p>
-
-        <p><br></p>
 
         <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank"> greasyfork页 </a>反馈</p>
 
+        <p><br></p>
+        
+        <p>1.8.4 更新内容(21.7.18):</p>
+
+        <p>修复了部分生成提示 "<span style="color: red;">md5获取失败</span>" 的问题</p>
+
+        <p><br></p>
+
+        <p>1.8.1 更新内容(21.7.6):</p>
+
+        <p>支持转存与生成 <span style="color: red;">20G以上</span> 文件的秒传</p>
+        
         <p><br></p>
         
         <p>1.7.9 更新内容(21.6.28):</p>
