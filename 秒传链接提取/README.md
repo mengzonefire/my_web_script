@@ -54,6 +54,8 @@
 
 1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: red;">不兼容</span>油猴子Greasemonkey
 
+2. 若持续报错 <span style="color: red;">接口调用失败(请重试/...)(#514)</span> 请尝试使用chrome浏览器 或 关闭杀软
+
 ## 待更新
 1. 支持 新版度盘页面 下的 "生成秒传" 功能
 2. 支持 [阿里云盘](https://www.aliyundrive.com/drive/) 的秒传提取&生成

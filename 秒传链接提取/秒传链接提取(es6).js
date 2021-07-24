@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.4
+// @version         1.8.5
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -549,12 +549,19 @@
             },
             onload: function (r) {
                 if (parseInt(r.status / 100) !== 2) {
-                    file_info.errno = r.status;
+                    if (r.status === 404) {
+                        file_info.errno = 909;
+                    } else {
+                        file_info.errno = r.status;
+                    }
                     myGenerater(file_id + 1);
                     return;
                 }
                 let r_json = JSON.parse(r.response);
                 console.log(r_json.list[0]);
+                if (!file_info.size) {
+                    file_info.size = r_json.list[0].size;
+                }
                 file_info.fs_id = r_json.list[0].fs_id;
                 let md5 = r_json.list[0].md5.match(/[\dA-Fa-f]{32}/);
                 if (md5) {
@@ -783,10 +790,17 @@
     DuParser.parseDu_v4 = function parseDu_v4(szUrl) {
         return szUrl.split('\n').map(function (z) {
             // unsigned long long: 0~18446744073709551615
-            return z.trim().match(/([\dA-Fa-f]{32})#([\dA-Fa-f]{32})#([\d]{1,20})#([\s\S]+)/);
+            return z.trim().match(/([\dA-Fa-f]{32})#(?:([\dA-Fa-f]{32})#)?([\d]{1,20})#([\s\S]+)/);
         }).filter(function (z) {
             return z;
         }).map(function (info) {
+            if (!info[2]) {
+                return {
+                    md5: info[1],
+                    size: info[3],
+                    path: info[4]
+                };
+            }
             return {
                 md5: info[1],
                 md5s: info[2],
@@ -855,6 +869,11 @@
         }
         let file = codeInfo[i];
         file_num.textContent = (i + 1).toString() + ' / ' + codeInfo.length.toString();
+        if (!file.md5s) {
+            file.md5 = file.md5.toLowerCase();
+            saveFile_v2(i);
+            return;
+        }
         switch (try_flag) {
             case 0:
                 file.md5 = file.md5.toUpperCase();
@@ -932,6 +951,8 @@
                 return 'md5获取失败(请参考分享教程)';
             case 500:
                 return '服务器错误(请等待24h再试)';
+            case 909:
+                return '路径不存在';
             default:
                 return '未知错误';
         }
@@ -943,14 +964,17 @@
             input: 'textarea',
             inputValue: str,
             showCancelButton: true,
-            inputPlaceholder: '[支持PanDL/梦姬标准/游侠/PCS-Go][支持批量]\n[输入setting进入设置页]',
+            inputPlaceholder: '[支持PD/标准码/游侠/GO][支持批量(换行分隔)]\n[输入set进入设置页][输入gen进入生成页]',
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             inputValidator: (value) => {
                 if (!value) {
                     return '链接不能为空';
                 }
-                if (value === 'setting') {
+                if (value === 'set') {
+                    return;
+                }
+                if (value === 'gen') {
                     return;
                 }
                 codeInfo = DuParser.parse(value);
@@ -960,8 +984,10 @@
             }
         }).then((result) => {
             if (!result.dismiss) {
-                if (result.value === 'setting') {
+                if (result.value === 'set') {
                     setting();
+                } else if (result.value === 'gen') {
+                    Gen_bdlink_byPath();
                 } else {
                     Process();
                 }
@@ -1245,6 +1271,31 @@
                     allowOutsideClick: false,
                     html: csd_hint_html
                 });
+            }
+        });
+    }
+
+    function Gen_bdlink_byPath() {
+        Swal.fire({
+            title: '请输入需要生成的文件路径',
+            input: 'textarea',
+            showCancelButton: true,
+            inputPlaceholder: '[支持批量(换行分隔)]',
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputValidator: (value) => {
+                if (!value) {
+                    return '文件路径不能为空';
+                }
+            }
+        }).then((result) => {
+            if (!result.dismiss) {
+                result.value.split('\n').map(function (z) {
+                    file_info_list.push({
+                        'path': z
+                    })
+                })
+                Gen_bdlink();
             }
         });
     }
