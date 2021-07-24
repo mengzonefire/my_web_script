@@ -293,9 +293,13 @@
                         });
                     }
                 } else {
+                    let errno = r.status;
+                    if (r.status === 500) {
+                        errno = 901;
+                    }
                     file_info_list.push({
                         'path': path,
-                        'errno': r.status
+                        'errno': errno
                     });
                 }
                 add_dir_list(dir_list, dir_id + 1);
@@ -953,6 +957,8 @@
                 return '服务器错误(请等待24h再试)';
             case 909:
                 return '路径不存在';
+            case 901:
+                return '文件数量超出限制';
             default:
                 return '未知错误';
         }
