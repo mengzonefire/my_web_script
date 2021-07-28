@@ -932,7 +932,7 @@
             case -8:
                 return '路径下存在同名文件';
             case 400:
-                return '请求错误(请尝试使用最新版Chrome浏览器)';
+                return '请求错误(请尝试使用最新版Chrome浏览器+更新油猴插件)';
             case 403:
                 return '接口被限制(请等待24h再试)';
             case 404:
