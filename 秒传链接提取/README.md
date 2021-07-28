@@ -50,7 +50,7 @@
 
 ## 常见问题
 
-（若秒传按钮不显示、无反应或弹窗卡死, 请按F12打开控制台查看&截图反馈报错）
+（若秒传按钮不显示、无反应或弹窗卡死, 请按F12打开控制台截图反馈, 并反馈脚本及油猴插件版本）
 
 1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: red;">不兼容</span>油猴子Greasemonkey
 
