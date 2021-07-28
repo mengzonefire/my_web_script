@@ -32,7 +32,7 @@
 
 * 使用了[仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)中的秒传提取代码，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 [![](https://github.githubassets.com/favicons/favicon.png) GitHub](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
 
-* 支持批量提取(回车分隔符), 支持url传参(一键秒传), 格式：`https://pan.baidu.com/#bdlink=[参数]`，[参数]为base64加密过的任意格式链接 (支持批量)
+* 支持批量提取(换行分隔符), 支持url传参(一键秒传), 格式：`https://pan.baidu.com/#bdlink=[参数]`，[参数]为base64加密过的任意格式链接 (支持批量)
 
 * 支持生成秒传, 选择文件/文件夹后即可看到秒传生成按钮
 
@@ -50,11 +50,13 @@
 
 ## 常见问题
 
-（若秒传按钮不显示、无反应或弹窗卡死, 请按F12打开控制台截图反馈, 并反馈脚本及油猴插件版本）
-
-1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, 注意脚本<span style="color: red;">不兼容</span>油猴子Greasemonkey
+1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, <span style="color: red;">不兼容</span>油猴子Greasemonkey
 
 2. 若持续报错 <span style="color: red;">接口调用失败(请重试/...)(#514)</span> 请尝试使用chrome浏览器 或 关闭杀软
+
+3. 首次使用会有更新弹窗, 若界面暗屏且<span style="color: red;">无法操作</span> , 请尝试关闭广告拦截插件
+
+*若遇到其他问题, 请按F12打开控制台截图反馈, 并反馈浏览器、油猴插件及脚本版本
 
 ## 待更新
 1. 支持 新版度盘页面 下的 "生成秒传" 功能
