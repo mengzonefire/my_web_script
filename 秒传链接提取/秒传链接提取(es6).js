@@ -1218,7 +1218,7 @@
     };
 
     const showUpdateInfo = () => {
-        if (!GM_getValue('1.8.4_no_first')) {
+        if (!GM_getValue('1.8.5_no_first')) {
             Swal.fire({
                 title: `秒传链接提取 更新内容`,
                 html: update_info,
@@ -1228,7 +1228,7 @@
                 allowOutsideClick: false,
                 confirmButtonText: '确定'
             }).then(() => {
-                GM_setValue('1.8.4_no_first', true);
+                GM_setValue('1.8.5_no_first', true);
             });
         }
     };
