@@ -178,7 +178,7 @@
         new_flag = false,
         file_info_list = [],
         gen_success_list = [],
-        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, bdstoken, interval;
+        dir, file_num, gen_num, gen_prog, codeInfo, recursive, bdcode, xmlhttpRequest, select_list, bdstoken, interval, bdlink;
     const myStyle = `style='width: 100%;height: 34px;display: block;line-height: 34px;text-align: center;'`;
     const myStyle2 = `style='color: #09AAFF;'`;
     const myBtnStyle = `style='font-size: 15px;color: #09AAFF;border: 2px solid #C3EAFF;border-radius: 4px;padding: 10px;margin: 0 5px;padding-top: 5px;padding-bottom: 5px; cursor: pointer'`;
@@ -1172,6 +1172,7 @@
         }).success(function (r) {
             if (!r.errno) {
                 bdstoken = r.result.bdstoken;
+                bdlink ? GetInfo(bdlink) : showUpdateInfo();
                 initButtonHome();
                 initButtonGen();
             } else {
@@ -1234,9 +1235,8 @@
 
     function myInit() {
         injectStyle();
-        const bdlink = GetInfo_url();
+        bdlink = GetInfo_url();
         window.addEventListener('DOMContentLoaded', () => {
-            bdlink ? GetInfo(bdlink) : showUpdateInfo();
             // 判断是否是新版页面
             if (document.getElementsByClassName('nd-main-layout').length) {
                 // 新版页面不自带jquery, 需要手动注入
@@ -1313,6 +1313,12 @@
         <p>若喜欢该脚本可前往 <a href="https://afdian.net/@mengzonefire" rel="noopener noreferrer" target="_blank">赞助页</a> 支持作者</p>
 
         <p>若出现任何问题请前往<a href="https://greasyfork.org/zh-CN/scripts/424574" rel="noopener noreferrer" target="_blank"> greasyfork页 </a>反馈</p>
+
+        <p><br></p>
+
+        <p>1.8.5 更新内容(21.7.30):</p>
+
+        <p>修复了部分转存提示 "<span style="color: red;">转存失败(尝试...)(#2)</span>" 的问题</p>
 
         <p><br></p>
         
