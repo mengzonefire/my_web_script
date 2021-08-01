@@ -13,13 +13,13 @@
 
 ## 相关教程
 
-* 脚本<span style="color: red;"> 不能正常使用 </span>或<span style="color: red;"> 不会安装 </span>, 请先阅读安装教程 [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/)
+* [安装教程](https://shimo.im/docs/Jqf8y260KuofSb4K/): 适用于<span style="color: red;"> 不能正常使用 </span>或<span style="color: red;"> 不会安装 </span>此脚本的用户 [Win/安卓/IOS]
 
-* 生成&分享过程中遇到问题, 例如 秒传无效 / md5获取失败 / 文件和谐, 可参考 [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/)
+* [分享教程](https://shimo.im/docs/TZ1JJuEjOM0wnFDH/): 适用于解决秒传 生成&分享 过程中遇到问题, 例如 秒传无效 / md5获取失败 / 文件和谐
 
-* 详细的关于 <span style="color: red;">文件和谐</span> 的说明可参考 [防和谐教程](https://shimo.im/docs/DGdDwPwTDhvyq6KX/)
+* [防和谐教程](https://shimo.im/docs/DGdDwPwTDhvyq6KX/): 关于度盘 <span style="color: red;">文件和谐</span> 的详解 
 
-* 脚本的完整使用教程(包含安装、提取、生成), 可参考 [秒传教程[视频版]](https://www.bilibili.com/video/BV1E5411H76K)
+* [视频教程](https://www.bilibili.com/video/BV1E5411H76K): 脚本的完整使用教程(包含安装、提取、生成) 
 
 ## 脚本说明
 
