@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.5
+// @version         1.8.6
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
 // @compatible      firefox Tampermonkey
 // @compatible      firefox Violentmonkey
-// @compatible      chrome Violentmonkey
 // @compatible      chrome Tampermonkey
+// @compatible      chrome Violentmonkey
 // @contributionURL https://afdian.net/@mengzonefire
 // @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
@@ -794,7 +794,7 @@
     DuParser.parseDu_v4 = function parseDu_v4(szUrl) {
         return szUrl.split('\n').map(function (z) {
             // unsigned long long: 0~18446744073709551615
-            return z.trim().match(/([\dA-Fa-f]{32})#(?:([\dA-Fa-f]{32})#)?([\d]{1,20})#([\s\S]+)/);
+            return z.trim().match(/^([\dA-Fa-f]{32})#(?:([\dA-Fa-f]{32})#)?([\d]{1,20})#([\s\S]+)/);
         }).filter(function (z) {
             return z;
         }).map(function (info) {

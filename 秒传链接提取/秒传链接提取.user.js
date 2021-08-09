@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.5
+// @version         1.8.6
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
 // @compatible      firefox Tampermonkey
 // @compatible      firefox Violentmonkey
-// @compatible      chrome Violentmonkey
 // @compatible      chrome Tampermonkey
+// @compatible      chrome Violentmonkey
 // @contributionURL https://afdian.net/@mengzonefire
 // @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
@@ -96,8 +96,14 @@ function _createForOfIteratorHelper(o, allowArrayLike) {
       return {
         s: F,
         n: function n() {
-          if (i >= o.length) return { done: true };
-          return { done: false, value: o[i++] };
+          if (i >= o.length)
+            return {
+              done: true,
+            };
+          return {
+            done: false,
+            value: o[i++],
+          };
         },
         e: function e(_e) {
           throw _e;
@@ -986,7 +992,7 @@ function _arrayLikeToArray(arr, len) {
         return z
           .trim()
           .match(
-            /([\dA-Fa-f]{32})#(?:([\dA-Fa-f]{32})#)?([\d]{1,20})#([\s\S]+)/
+            /^([\dA-Fa-f]{32})#(?:([\dA-Fa-f]{32})#)?([\d]{1,20})#([\s\S]+)/
           );
       })
       .filter(function (z) {
@@ -1110,18 +1116,22 @@ function _arrayLikeToArray(arr, len) {
 
     switch (try_flag) {
       case 0:
+        console.log("use UpperCase md5");
         file.md5 = file.md5.toUpperCase();
         break;
 
       case 1:
+        console.log("use LowerCase md5");
         file.md5 = file.md5.toLowerCase();
         break;
 
       case 2:
+        console.log("use randomCase md5");
         file.md5 = randomStringTransform(file.md5);
         break;
 
       case 3:
+        console.log("use saveFile_v2");
         file.md5 = file.md5.toLowerCase();
         saveFile_v2(i);
         return;
@@ -1387,12 +1397,8 @@ function _arrayLikeToArray(arr, len) {
         uploadid: file_info.uploadid,
         path: dir + file_info.path,
         size: file_info.size,
-        mode: 1,
         isdir: 0,
         rtype: check_mode ? 3 : 0,
-        a: "commit",
-        sequence: 1,
-        autoinit: 1,
       },
     })
       .success(function (r) {
@@ -1420,7 +1426,6 @@ function _arrayLikeToArray(arr, len) {
         block_list: JSON.stringify([file_info.md5]),
         path: dir + file_info.path,
         size: file_info.size,
-        mode: 1,
         isdir: 0,
         autoinit: 1,
       },
