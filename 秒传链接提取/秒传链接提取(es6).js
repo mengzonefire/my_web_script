@@ -933,6 +933,7 @@
             case -7:
                 return '保存路径存在非法字符';
             case -6:
+                return '未认证(请切换到旧版页面)';
             case -8:
                 return '路径下存在同名文件';
             case 400:
