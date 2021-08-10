@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.6
+// @version         1.8.7
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -990,7 +990,7 @@
                 }
                 codeInfo = DuParser.parse(value);
                 if (!codeInfo.length) {
-                    return '未识别到正确的链接';
+                    return '<p>未识别到正确的链接 <a href="https://shimo.im/docs/hTCKJHPJRkp8PDR8/">查看支持格式</a></p>';
                 }
             }
         }).then((result) => {

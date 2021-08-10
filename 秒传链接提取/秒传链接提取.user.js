@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.6
+// @version         1.8.7
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -96,14 +96,8 @@ function _createForOfIteratorHelper(o, allowArrayLike) {
       return {
         s: F,
         n: function n() {
-          if (i >= o.length)
-            return {
-              done: true,
-            };
-          return {
-            done: false,
-            value: o[i++],
-          };
+          if (i >= o.length) return { done: true };
+          return { done: false, value: o[i++] };
         },
         e: function e(_e) {
           throw _e;
@@ -1181,6 +1175,8 @@ function _arrayLikeToArray(arr, len) {
         return "保存路径存在非法字符";
 
       case -6:
+        return "未认证(请切换到旧版页面)";
+
       case -8:
         return "路径下存在同名文件";
 
@@ -1259,7 +1255,7 @@ function _arrayLikeToArray(arr, len) {
         codeInfo = DuParser.parse(value);
 
         if (!codeInfo.length) {
-          return "未识别到正确的链接";
+          return '<p>未识别到正确的链接 <a href="https://shimo.im/docs/hTCKJHPJRkp8PDR8/">查看支持格式</a></p>';
         }
       },
     }).then(function (result) {
