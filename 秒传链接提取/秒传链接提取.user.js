@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.8
+// @version         1.8.9
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -771,6 +771,8 @@ function _arrayLikeToArray(arr, len) {
 
     if (r.finalUrl.indexOf("issuecdn.baidupcs.com") !== -1) {
       file_info.errno = 1919;
+      myGenerater(file_id + 1);
+      return;
     } else if (parseInt(r.status / 100) === 2) {
       var responseHeaders = r.responseHeaders;
       console.log(responseHeaders);
@@ -789,7 +791,6 @@ function _arrayLikeToArray(arr, len) {
         if (!file_info.md5) {
           file_info.errno = 996;
         }
-
         myGenerater(file_id + 1);
         return;
       }

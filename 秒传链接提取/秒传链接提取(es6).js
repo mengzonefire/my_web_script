@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            秒传链接提取
 // @namespace       moe.cangku.mengzonefire
-// @version         1.8.8
+// @version         1.8.9
 // @description     用于提取和生成百度网盘秒传链接
 // @author          mengzonefire
 // @license         MIT
@@ -661,6 +661,8 @@
     gen_prog.textContent = "100%";
     if (r.finalUrl.indexOf("issuecdn.baidupcs.com") !== -1) {
       file_info.errno = 1919;
+      myGenerater(file_id + 1);
+      return;
     } else if (parseInt(r.status / 100) === 2) {
       let responseHeaders = r.responseHeaders;
       console.log(responseHeaders);
@@ -1047,6 +1049,10 @@
       title: "请输入秒传",
       input: "textarea",
       inputValue: str,
+      // add: 添加参数以防止新版界面下的body样式突变
+      heightAuto: false,
+      scrollbarPadding: false,
+      // add end
       showCancelButton: true,
       inputPlaceholder:
         "[支持PD/标准码/游侠/GO][支持批量(换行分隔)]\n[输入set进入设置页][输入gen进入生成页]",
