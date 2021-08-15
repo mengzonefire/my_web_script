@@ -1186,7 +1186,7 @@
   function saveFile_v2_create(i) {
     let file_info = codeInfo[i];
     $.ajax({
-      url: create_url,
+      url: create_url+`&bdstoken=${bdstoken}`,
       type: "POST",
       dataType: "json",
       data: {
@@ -1215,7 +1215,7 @@
   function saveFile_v2(i) {
     let file_info = codeInfo[i];
     $.ajax({
-      url: precreate_url,
+      url: precreate_url+`&bdstoken=${bdstoken}`,
       type: "POST",
       dataType: "json",
       data: {
