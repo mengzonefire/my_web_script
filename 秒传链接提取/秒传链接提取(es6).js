@@ -39,9 +39,9 @@
     "/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000";
   const meta_url2 = "/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=";
   const meta_url =
-    "http://d.pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=meta&path=";
+    "/rest/2.0/xpan/file?app_id=778750&method=meta&path=";
   const pcs_url =
-    "https://pcs.baidu.com/rest/2.0/pcs/file?app_id=778750&method=download";
+    "/rest/2.0/xpan/file?app_id=778750&method=download";
   const css_url = {
     Minimal:
       "https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css",
@@ -602,13 +602,13 @@
         } else if (r_json.list[0].block_list.length === 1) {
           file_info.md5 = r_json.list[0].block_list[0].toLowerCase();
         }
-        get_file_md5(file_id);
+        get_file_dlink(file_id);
       },
     };
     GM_xmlhttpRequest(get_dl_par);
   }
 
-  function get_file_md5(file_id) {
+  function get_file_dlink(file_id) {
     let file_info = file_info_list[file_id];
     let get_dl_par = {
       url: meta_url2 + JSON.stringify([file_info.fs_id]),
