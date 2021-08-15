@@ -37,11 +37,9 @@
   const create_url = "/rest/2.0/xpan/file?method=create";
   const api_url =
     "/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000";
+  const meta_url = "/rest/2.0/xpan/file?app_id=778750&method=meta&path=";
   const meta_url2 = "/rest/2.0/xpan/multimedia?method=filemetas&dlink=1&fsids=";
-  const meta_url =
-    "/rest/2.0/xpan/file?app_id=778750&method=meta&path=";
-  const pcs_url =
-    "/rest/2.0/xpan/file?app_id=778750&method=download";
+  const pcs_url = "/rest/2.0/xpan/file?app_id=778750&method=download";
   const css_url = {
     Minimal:
       "https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css",
@@ -591,6 +589,7 @@
           return;
         }
         let r_json = JSON.parse(r.response);
+        // debug
         console.log(r_json.list[0]);
         if (!file_info.size) {
           file_info.size = r_json.list[0].size;
@@ -620,6 +619,8 @@
       },
       onload: function (r) {
         let r_json = JSON.parse(r.response);
+        // debug
+        console.log(r_json.list[0]);
         if (r_json.errno) {
           file_info.errno = r_json.errno;
           myGenerater(file_id + 1);
