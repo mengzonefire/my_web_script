@@ -33,7 +33,6 @@
   "use strict";
   const rapid_url = "/api/rapidupload";
   const bdstoken_url = "/api/gettemplatevariable";
-  const precreate_url = "/rest/2.0/xpan/file?method=precreate";
   const create_url = "/rest/2.0/xpan/file?method=create";
   const api_url =
     "/rest/2.0/xpan/multimedia?method=listall&order=name&limit=10000";
@@ -1183,7 +1182,7 @@
     Swal.getHtmlContainer().appendChild(content);
   }
 
-  function saveFile_v2_create(i) {
+  function saveFile_v2(i) {
     let file_info = codeInfo[i];
     $.ajax({
       url: create_url+`&bdstoken=${bdstoken}`,
@@ -1191,7 +1190,6 @@
       dataType: "json",
       data: {
         block_list: JSON.stringify([file_info.md5]),
-        uploadid: file_info.uploadid,
         path: dir + file_info.path,
         size: file_info.size,
         isdir: 0,
@@ -1208,41 +1206,6 @@
         if (file_info.errno === 2) {
           file_info.errno = 404;
         }
-        saveFile(i + 1, 0);
-      });
-  }
-
-  function saveFile_v2(i) {
-    let file_info = codeInfo[i];
-    $.ajax({
-      url: precreate_url+`&bdstoken=${bdstoken}`,
-      type: "POST",
-      dataType: "json",
-      data: {
-        block_list: JSON.stringify([file_info.md5]),
-        path: dir + file_info.path,
-        size: file_info.size,
-        isdir: 0,
-        autoinit: 1,
-      },
-    })
-      .success(function (r) {
-        if (!r.errno) {
-          // 若返回的block_list非空则表示不识别该md5(#404)
-          if (r.block_list.length) {
-            file_info.errno = 404;
-          } else if (r.uploadid) {
-            file_info.uploadid = r.uploadid;
-            saveFile_v2_create(i);
-            return;
-          }
-        } else {
-          file_info.errno = r.errno;
-        }
-        saveFile(i + 1, 0);
-      })
-      .fail(function (r) {
-        file_info.errno = 114;
         saveFile(i + 1, 0);
       });
   }
