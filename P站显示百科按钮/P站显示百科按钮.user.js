@@ -5,7 +5,7 @@
 // @version           1.0.0
 // @author            mengzonefire
 // @match             *://www.pixiv.net/tags/*
-// @require           https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
+// @require           https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
 // @run-at            document-start
 // ==/UserScript==
 

@@ -5,7 +5,7 @@
 // @description       EH画廊自动/批量评分脚本
 // @author            mengzonefire
 // @require           https://cdn.jsdelivr.net/npm/sweetalert2@9
-// @require           https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
+// @require           https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
 // @match             *://exhentai.org/g*
 // @match             *://e-hentai.org/g*
 // @match             *://exhentai.org/uploader/*
