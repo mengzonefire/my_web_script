@@ -23,6 +23,14 @@
 
 * [视频教程](https://www.bilibili.com/video/BV1E5411H76K): 脚本的完整使用教程(包含安装、提取、生成) 
 
+## 常见问题
+
+1. 若持续报错 <span style="color: red;">接口调用失败(请重试/...)(#514)</span> 请尝试使用chrome浏览器 或 关闭杀软
+
+2. 若使用脚本时 <span style="color: red;">页面卡死、无法操作</span>, 请尝试关闭广告拦截插件
+
+\*若遇到其他问题, 请按F12打开控制台截图反馈, 并反馈浏览器、油猴插件及脚本版本
+
 ## 脚本说明
 
 * 参考了初版秒传脚本 [仓库用度盘投稿助手](https://greasyfork.org/zh-CN/scripts/3285)进行开发，代码通过babel工具转换为es5，若需要es6版本的源码，请前往 <img src="https://github.githubassets.com/favicons/favicon.png" width='16'>[GitHub](https://github.com/mengzonefire/my_web_script/blob/main/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96/%E7%A7%92%E4%BC%A0%E9%93%BE%E6%8E%A5%E6%8F%90%E5%8F%96(es6).js)
@@ -42,16 +50,6 @@
 <ul><li><p>梦姬标准/标准码: D5AABEFC3290F7A3C09912228B136D0C#821A9F0D27FCD19C80474D2140ED2D85#6467659#test.exe</p></li><li><p>PanDL格式: bdpan://dGVzdC5leGV8NjQ2NzY1OXxENUFBQkVGQzMyOTBGN0EzQzA5OTEyMjI4QjEzNkQwQ3w4MjFBOUYwRDI3RkNEMTlDODA0NzREMjE0MEVEMkQ4NQ==</p></li><li><p>PCS-GO格式: BaiduPCS-Go rapidupload -length=6467659 -md5=D5AABEFC3290F7A3C09912228B136D0C -slicemd5=821A9F0D27FCD19C80474D2140ED2D85 &quot;/test.exe&quot;</p></li></ul>
 
 </details>
-
-## 常见问题
-
-1. 安装脚本显示 <span style="color: red;">编译错误</span> 请先安装油猴Tampermonkey或暴力猴Violentmonkey, <span style="color: red;">不兼容</span>油猴子Greasemonkey
-
-2. 若持续报错 <span style="color: red;">接口调用失败(请重试/...)(#514)</span> 请尝试使用chrome浏览器 或 关闭杀软
-
-3. 首次使用会有更新弹窗, 若界面暗屏且<span style="color: red;">无法操作</span> , 请尝试关闭广告拦截插件
-
-\*若遇到其他问题, 请按F12打开控制台截图反馈, 并反馈浏览器、油猴插件及脚本版本
 
 ## 待更新
 1. 支持 新版度盘页面 下的 "生成秒传" 功能
