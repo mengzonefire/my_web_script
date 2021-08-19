@@ -13,11 +13,12 @@
 // @match           *://pan.baidu.com/disk/main*
 // @match           *://pan.baidu.com/disk/home*
 // @match           *://yun.baidu.com/disk/home*
-// @resource jquery         https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js
 // @resource sweetalert2Css https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css
-// @require         https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js
 // @require         https://cdn.jsdelivr.net/npm/js-base64
+// @require         https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
+// @require         https://cdn.jsdelivr.net/npm/jquery-migrate
 // @require         https://cdn.staticfile.org/spark-md5/3.0.0/spark-md5.min.js
+// @require         https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js
 // @grant           GM_setValue
 // @grant           GM_getValue
 // @grant           GM_deleteValue
