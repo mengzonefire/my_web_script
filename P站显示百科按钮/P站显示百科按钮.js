@@ -2,7 +2,7 @@
 // @name              Pixiv显示百科按钮
 // @description       显示一个打开Pixiv百科页面的按钮
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.0
+// @version           1.0.1
 // @author            mengzonefire
 // @match             *://www.pixiv.net/tags/*
 // @require           https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
@@ -19,6 +19,7 @@
             href = window.location.href;
             link = href.match(/\/tags\/([^\/]+)\/?/)[1];
             html_code = `<button aria-disabled="false" class="sc-13xx43k-0 sc-13xx43k-1 kzKWyw" onclick="window.open('https://dic.pixiv.net/a/${link}','_self')">Pixiv百科全书</button>`;
+            clearInterval(loop);
             set_btn();
         }
     }, 1000);
