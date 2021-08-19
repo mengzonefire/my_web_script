@@ -11,9 +11,9 @@
 
 !function () {
     'use strict';
-    var href = "";
     var html_code = "";
-    var link = "";
+    let link = "";
+    let href = "";
     let loop = setInterval(() => {
         if (window.location.href != href) {
             href = window.location.href;
