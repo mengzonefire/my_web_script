@@ -2,7 +2,7 @@
 // @name              Pixiv显示百科按钮
 // @description       显示一个打开Pixiv百科页面的按钮
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.2
+// @version           1.0.3
 // @author            mengzonefire
 // @contributionURL   https://afdian.net/@mengzonefire
 // @match             *://www.pixiv.net/*
@@ -26,12 +26,12 @@
       window.WebKitMutationObserver ||
       window.MozMutationObserver;
     let observer = new MutationObserver(urlChangeHandler);
-    observer.observe($('head > link[rel="canonical"]')[0], {
-      attributes: true,
+    observer.observe($("head > title")[0], {
+      childList: true,
     });
   }
-  function urlChangeHandler(mutationsList) {
-    tag = mutationsList[0].target.href.match(/\/tags\/([^/]+)/);
+  function urlChangeHandler() {
+    tag = window.location.href.match(/\/tags\/([^/]+)/);
     if (tag) {
       tag = tag[1];
       console.log(`match tag: ${decodeURIComponent(tag)}`);
