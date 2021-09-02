@@ -2,34 +2,41 @@
 // @name              Pixiv显示百科按钮
 // @description       显示一个打开Pixiv百科页面的按钮
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.1
+// @version           1.0.2
 // @author            mengzonefire
-// @match             *://www.pixiv.net/tags/*
+// @contributionURL   https://afdian.net/@mengzonefire
+// @match             *://www.pixiv.net/*
 // @require           https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
-// @run-at            document-start
+// @run-at            document-end
 // ==/UserScript==
-
-!function () {
-    'use strict';
-    var html_code = "";
-    let link = "";
-    let href = "";
-    let loop = setInterval(() => {
-        if (window.location.href != href) {
-            href = window.location.href;
-            link = href.match(/\/tags\/([^\/]+)\/?/)[1];
-            html_code = `<button aria-disabled="false" class="sc-13xx43k-0 sc-13xx43k-1 kzKWyw" onclick="window.open('https://dic.pixiv.net/a/${link}','_self')">Pixiv百科全书</button>`;
-            clearInterval(loop);
-            set_btn();
-        }
-    }, 1000);
-
-    function set_btn() {
-        let loop = setInterval(() => {
-            var html_tag = $("div.rr60ze-3.foZeuY");
-            if (!html_tag.length) return false;
-            html_tag.append(html_code);
-            clearInterval(loop);
-        }, 500);
+!(() => {
+  "use strict";
+  const htmlTag = "div.sc-1973m3p-0.eafcux";
+  var tag = "";
+  function addBtn() {
+    let html_tag = $(htmlTag);
+    if (html_tag.length) {
+      let htmlBtn = `<button id="mzf_dic_btn" aria-disabled="false" class="sc-13xx43k-0 sc-13xx43k-1 kzKWyw" onclick="window.open('https://dic.pixiv.net/a/${tag}','_self')">Pixiv百科全书</button>`;
+      html_tag.before(htmlBtn);
+    } else setTimeout(addBtn, 100);
+  }
+  function start() {
+    let MutationObserver =
+      window.MutationObserver ||
+      window.WebKitMutationObserver ||
+      window.MozMutationObserver;
+    let observer = new MutationObserver(urlChangeHandler);
+    observer.observe($('head > link[rel="canonical"]')[0], {
+      attributes: true,
+    });
+  }
+  function urlChangeHandler(mutationsList) {
+    tag = mutationsList[0].target.href.match(/\/tags\/([^/]+)/);
+    if (tag) {
+      tag = tag[1];
+      console.log(`match tag: ${decodeURIComponent(tag)}`);
+      addBtn();
     }
-}();
+  }
+  jQuery(start);
+})();
