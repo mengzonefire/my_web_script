@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name              仓库屏蔽用户评论&投稿
+// @name              仓库屏蔽用户评论&帖子
 // @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
 // @namespace         moe.cangku.mengzonefire
 // @version           1.0.0
@@ -15,8 +15,9 @@
 !(function () {
   "use strict";
 
+  const matchUserId = /\/user\/(\d+)/;
   const homeBtn =
-    '<a id="mzf-block-archive" href="javascript:;" class="view meta-label float-left">屏蔽作者</a>'; //主页的帖子屏蔽按钮
+    '<a id="mzf-block-archive" href="javascript:;" class="view meta-label">屏蔽作者</a>'; //主页的帖子屏蔽按钮
   const commentBtn =
     '<a id="mzf-block-comment" href="javascript:;" class="operate-btn"> 屏蔽用户 </a>'; //帖子下的评论屏蔽按钮
   const notiBtn =
@@ -45,12 +46,13 @@
     let matchArchive = href.match(/archives\/\d+/);
     let matchHome = href.match(/cangku.icu\/($|\?page=\d+)/);
     let matchAccount = href.match(/account/);
-    let matchNoti = href.match(/notification/);
+    let matchNoti = href.match(/notification\?type=reply/);
     if (matchArchive) {
       // 评论列表并不会立即加载, 添加轮询
       observer1 = new MutationObserver(ArchiveHandler);
       observer1.observe($("#comment")[0], {
         childList: true,
+        subtree: true,
       });
     } else if (matchHome) {
       observer2 = new MutationObserver(HomeHandler);
@@ -75,16 +77,19 @@
   }
 
   function ArchiveHandler() {
+    killComment();
     if (!$("#mzf-block-comment").length)
       $("div.comment-operate").append(commentBtn);
   }
 
   function HomeHandler() {
+    killArchive();
     if (!$("#mzf-block-archive").length)
       $("span.view.meta-label").after(homeBtn);
   }
 
   function NotiHandler() {
+    killComment2();
     $("time").each((index, item) => {
       if (!$(item).prev("#mzf-block-comment2").length) $(item).before(notiBtn);
     });
@@ -96,37 +101,96 @@
 
   function onSetingBtn() {
     $("div.col-md-9>div.manage-card").replaceWith(setHtml);
-    let id1 = GM_getValue("blockCommentId") || [];
-    let id2 = GM_getValue("blockCommentId") || [];
-    $("#mzf-input-id1").value = id1.join(" ");
-    $("#mzf-input-id2").value = id2.join(" ");
+    let id1 = GM_getValue("blockCommentId") || "";
+    let id2 = GM_getValue("blockArchiveId") || "";
+    $("#mzf-input-id1")[0].value = id1;
+    $("#mzf-input-id2")[0].value = id2;
   }
 
   function onSaveSetingBtn() {
-    let blockCommentId = $("#mzf-input-id1").value.split(/\s+/);
-    let blockArchiveId = $("#mzf-input-id2").value.split(/\s+/);
-    GM_setValue("blockCommentId", Array.from(new Set(blockCommentId)));
-    GM_setValue("blockArchiveId", Array.from(new Set(blockArchiveId)));
+    let blockCommentId = $("#mzf-input-id1")[0].value.split(/\s+/);
+    let blockArchiveId = $("#mzf-input-id2")[0].value.split(/\s+/);
+    GM_setValue(
+      "blockCommentId",
+      Array.from(new Set(blockCommentId)).join(" ")
+    );
+    GM_setValue(
+      "blockArchiveId",
+      Array.from(new Set(blockArchiveId)).join(" ")
+    );
     alert("设置成功");
   }
 
   function onBlockArchive() {
-    console.log($(this));
+    let ckeckEle = $(this).parents("div.post").find("a.author");
+    if (ckeckEle.length) {
+      let idList = GM_getValue("blockArchiveId") || "";
+      idList = idList.split(/\s+/);
+      idList.push(ckeckEle[0].href.match(matchUserId)[1]);
+      GM_setValue("blockArchiveId", idList.join(" "));
+      alert("屏蔽成功");
+      killArchive();
+    }
   }
 
   function onBlockComment() {
-    console.log($(this));
+    let ckeckEle = $(this).parents("div.content-wrap").find("a.author");
+    if (ckeckEle.length) {
+      let idList = GM_getValue("blockCommentId") || "";
+      idList = idList.split(/\s+/);
+      idList.push(ckeckEle[0].href.match(matchUserId)[1]);
+      GM_setValue("blockCommentId", idList.join(" "));
+      alert("屏蔽成功");
+      killComment();
+    }
   }
 
   function onBlockComment2() {
-    console.log($(this));
+    let ckeckEle = $(this)
+      .parents("a.notification-item")
+      .find("div.avatar-wrapper");
+    if (ckeckEle.length) {
+      let idList = GM_getValue("blockCommentId") || "";
+      idList = idList.split(/\s+/);
+      idList.push(ckeckEle[0].children[0].href.match(matchUserId)[1]);
+      GM_setValue("blockCommentId", idList.join(" "));
+      alert("屏蔽成功");
+      killComment2();
+    }
   }
 
-  function killComment2() {}
+  function killComment() {
+    let blockCommentId = GM_getValue("blockCommentId") || "";
+    blockCommentId = blockCommentId.split(/\s+/);
+    $("div.comment-body li[id]").each((index, item) => {
+      let userId = $(item)
+        .find("div.avatar-wrap")[0]
+        .children[0].href.match(matchUserId)[1];
+      if (blockCommentId.indexOf(userId) !== -1) item.remove();
+    });
+  }
 
-  function killComment() {}
+  function killComment2() {
+    let blockCommentId = GM_getValue("blockCommentId") || "";
+    blockCommentId = blockCommentId.split(/\s+/);
+    $("a.notification-item").each((index, item) => {
+      let userId = $(item)
+        .find("div.avatar-wrapper")[0]
+        .children[0].href.match(matchUserId)[1];
+      if (blockCommentId.indexOf(userId) !== -1) item.remove();
+    });
+  }
 
-  function killArchive() {}
+  function killArchive() {
+    let blockArchiveId = GM_getValue("blockArchiveId") || "";
+    blockArchiveId = blockArchiveId.split(/\s+/);
+    $("div.post").each((index, item) => {
+      let userId = $(item)
+        .find("a.meta-label")[0]
+        .href.match(matchUserId)[1];
+      if (blockArchiveId.indexOf(userId) !== -1) item.remove();
+    });
+  }
 
   function listenBtn() {
     // 预先绑定好按钮事件
