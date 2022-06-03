@@ -2,7 +2,7 @@
 // @name              仓库屏蔽用户评论&帖子
 // @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.0
+// @version           1.0.1
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -122,7 +122,7 @@
   }
 
   function onBlockArchive() {
-    let ckeckEle = $(this).parents("div.post").find("a.author");
+    let ckeckEle = $(this).parents("div.post").find("a.meta-label");
     if (ckeckEle.length) {
       let idList = GM_getValue("blockArchiveId") || "";
       idList = idList.split(/\s+/);
@@ -185,9 +185,7 @@
     let blockArchiveId = GM_getValue("blockArchiveId") || "";
     blockArchiveId = blockArchiveId.split(/\s+/);
     $("div.post").each((index, item) => {
-      let userId = $(item)
-        .find("a.meta-label")[0]
-        .href.match(matchUserId)[1];
+      let userId = $(item).find("a.meta-label")[0].href.match(matchUserId)[1];
       if (blockArchiveId.indexOf(userId) !== -1) item.remove();
     });
   }
