@@ -2,7 +2,7 @@
 // @name              仓库屏蔽用户评论&帖子
 // @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.1
+// @version           1.0.2
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -163,9 +163,9 @@
     let blockCommentId = GM_getValue("blockCommentId") || "";
     blockCommentId = blockCommentId.split(/\s+/);
     $("div.comment-body li[id]").each((index, item) => {
-      let userId = $(item)
-        .find("div.avatar-wrap")[0]
-        .children[0].href.match(matchUserId)[1];
+      let checkELe = $(item).find("div.avatar-wrap");
+      if (!checkELe.length) return;
+      let userId = checkELe[0].children[0].href.match(matchUserId)[1];
       if (blockCommentId.indexOf(userId) !== -1) item.remove();
     });
   }
@@ -174,9 +174,9 @@
     let blockCommentId = GM_getValue("blockCommentId") || "";
     blockCommentId = blockCommentId.split(/\s+/);
     $("a.notification-item").each((index, item) => {
-      let userId = $(item)
-        .find("div.avatar-wrapper")[0]
-        .children[0].href.match(matchUserId)[1];
+      let checkELe = $(item).find("div.avatar-wrapper");
+      if (!checkELe.length) return;
+      let userId = checkELe[0].children[0].href.match(matchUserId)[1];
       if (blockCommentId.indexOf(userId) !== -1) item.remove();
     });
   }
@@ -185,7 +185,9 @@
     let blockArchiveId = GM_getValue("blockArchiveId") || "";
     blockArchiveId = blockArchiveId.split(/\s+/);
     $("div.post").each((index, item) => {
-      let userId = $(item).find("a.meta-label")[0].href.match(matchUserId)[1];
+      let checkELe = $(item).find("a.meta-label");
+      if (!checkELe.length) return;
+      let userId = checkELe[0].href.match(matchUserId)[1];
       if (blockArchiveId.indexOf(userId) !== -1) item.remove();
     });
   }
