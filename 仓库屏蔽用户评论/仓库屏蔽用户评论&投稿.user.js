@@ -2,7 +2,7 @@
 // @name              仓库屏蔽用户评论&帖子
 // @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.4
+// @version           1.0.5
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -131,7 +131,7 @@
   // DOM按钮添加函数定义
   function addArchiveBtn() {
     if ($("#mzf-archive-action").length) return;
-    let target = $("article div.meta");
+    let target = $("article div.header div.meta");
     let userId = [...target[0].children[0].href.matchAll(/user\/(\d+)/g)][0];
     if (!userId) return; // 未加载到href属性
     userId = userId[1];
