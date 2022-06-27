@@ -2,7 +2,7 @@
 // @name              仓库屏蔽用户评论&帖子
 // @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.6
+// @version           1.0.5
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -16,7 +16,15 @@
   "use strict";
 
   // 全局变常量声明
-  const matchUserId = /\/user\/(\d+)/;
+  const host = "cangku.icu";
+  const regUserId = new RegExp("/user/(\\d+)");
+  const regArchive = new RegExp(`${host}/archives/\\d+`);
+  const regHome = new RegExp(`${host}/(\\?page=\\d+)?`);
+  const regRank = new RegExp(`${host}/rank`);
+  const regCategory = new RegExp(`${host}/(\\?page=\\d+)?`);
+  const regAccount = new RegExp(`${host}/account`);
+  const regNoti = new RegExp(`${host}/notification\\?type=reply`);
+  const regUserPage = new RegExp(`${host}/user/\\d+`);
   const archiveBtn =
     '<a id="mzf-archive-action" href="javascript:;" class="meta-label primary text-small"></a>'; //帖子页面内 标签上的屏蔽按钮
   const userAction =
@@ -32,7 +40,7 @@
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setHtml =
-    '<div class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"></div><div class="form-group"><label>屏蔽标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword" type="text" class="form-control"></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>';
+    '<div class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword" type="text" class="form-control"></div> <div class="form-group"><label for="block-mode">屏蔽方式:</label><select id="block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>';
   const MutationObserver =
     window.MutationObserver ||
     window.WebKitMutationObserver ||
@@ -74,12 +82,7 @@
 
   function start() {
     let href = location.href;
-    let matchArchive = href.match(/archives\/\d+/);
-    let matchHome = href.match(/cangku.icu\/($|\?page=\d+)/);
-    let matchAccount = href.match(/account/);
-    let matchNoti = href.match(/notification\?type=reply/);
-    let matchUser = href.match(/user\/\d+/);
-    if (matchArchive) {
+    if (href.match(regArchive)) {
       // 评论列表并不会立即加载, 添加轮询
       observer1 = new MutationObserver(ArchiveHandler);
       observer1.observe($("#comment")[0], {
@@ -87,18 +90,27 @@
         subtree: true,
       });
       addArchiveBtn();
-    } else if (matchHome) {
+    } else if (
+      href.match(regHome) ||
+      href.match(regCategory || href.match(regRank))
+    ) {
       observer2 = new MutationObserver(HomeHandler);
-      observer2.observe($("div.post-list>span.row")[0], {
-        childList: true,
-      });
-    } else if (matchNoti) {
+      observer2.observe(
+        $(
+          "div.post-list>span.row, div.category-post>span.row, div.rank-post>span.row"
+        )[0],
+        {
+          childList: true,
+        }
+      );
+    } else if (href.match(regNoti)) {
       observer3 = new MutationObserver(NotiHandler);
       observer3.observe($("div.notification-list")[0], {
         childList: true,
       });
-    } else if (matchAccount && !$("#mzf-block-set").length) addSetBtn();
-    else if (matchUser) addUserBtn();
+    } else if (href.match(regAccount) && !$("#mzf-block-set").length)
+      addSetBtn();
+    else if (href.match(regUserPage)) addUserBtn();
   }
 
   // 页面变化事件回调handler定义
@@ -213,9 +225,7 @@
   function onBlockArchive() {
     let ckeckEle = $(this).parents("div.post").find("a.meta-label");
     if (ckeckEle.length) {
-      blockManager("blockArchiveId").add(
-        ckeckEle[0].href.match(matchUserId)[1]
-      );
+      blockManager("blockArchiveId").add(ckeckEle[0].href.match(regUserId)[1]);
       alert("屏蔽成功");
       killArchive();
     }
@@ -236,9 +246,7 @@
   function onBlockComment() {
     let ckeckEle = $(this).parents("div.content-wrap").find("a.author");
     if (ckeckEle.length) {
-      blockManager("blockCommentId").add(
-        ckeckEle[0].href.match(matchUserId)[1]
-      );
+      blockManager("blockCommentId").add(ckeckEle[0].href.match(regUserId)[1]);
       alert("屏蔽成功");
       killComment();
     }
@@ -250,7 +258,7 @@
       .find("div.avatar-wrapper");
     if (ckeckEle.length) {
       blockManager("blockCommentId").add(
-        ckeckEle[0].children[0].href.match(matchUserId)[1]
+        ckeckEle[0].children[0].href.match(regUserId)[1]
       );
       alert("屏蔽成功");
       killComment2();
@@ -262,7 +270,7 @@
     $("div.comment-body li[id]").each((index, item) => {
       let checkELe = $(item).find("div.avatar-wrap");
       if (!checkELe.length) return;
-      let userId = checkELe[0].children[0].href.match(matchUserId)[1];
+      let userId = checkELe[0].children[0].href.match(regUserId)[1];
       if (blockManager("blockCommentId").isBlock(userId)) item.remove();
     });
   }
@@ -271,7 +279,7 @@
     $("a.notification-item").each((index, item) => {
       let checkELe = $(item).find("div.avatar-wrapper");
       if (!checkELe.length) return;
-      let userId = checkELe[0].children[0].href.match(matchUserId)[1];
+      let userId = checkELe[0].children[0].href.match(regUserId)[1];
       if (blockManager("blockCommentId").isBlock(userId)) item.remove();
     });
   }
@@ -281,7 +289,7 @@
       item = $(item);
       let checkELe = item.find("a.meta-label");
       if (!checkELe.length) return;
-      let userId = checkELe[0].href.match(matchUserId)[1];
+      let userId = checkELe[0].href.match(regUserId)[1];
       if (blockManager("blockArchiveId").isBlock(userId))
         item.css("display", "none");
       else item.css("display", "block");
