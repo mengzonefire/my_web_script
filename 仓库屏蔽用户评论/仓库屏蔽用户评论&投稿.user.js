@@ -40,7 +40,7 @@
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setHtml =
-    '<div class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword" type="text" class="form-control"></div> <div class="form-group"><label for="block-mode">屏蔽方式:</label><select id="block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>';
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword" type="text" class="form-control"></div> <div class="form-group"><label for="block-mode">屏蔽方式</label><select id="block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
   const MutationObserver =
     window.MutationObserver ||
     window.WebKitMutationObserver ||
@@ -177,6 +177,15 @@
   }
 
   function addSetBtn() {
+    $("li.menu-list-item a").click(() => {
+      $("#mzf-block-set").removeClass();
+      $("#mzf-manage-card").css("display", "none");
+      $("div.col-md-9>.manage-card[id!='mzf-manage-card']").css(
+        "display",
+        "flex"
+      );
+      $('a[aria-current="page"]').addClass("router-link-exact-active active");
+    }); // 绑定原侧栏按钮事件切换dom显隐，防止干扰原生的切换效果
     $("ul.menu-group-list").append(setBtn);
   }
 
@@ -210,7 +219,13 @@
   }
 
   function onSetingBtn() {
-    $("div.col-md-9>div.manage-card").replaceWith(setHtml);
+    if ($("a.router-link-exact-active.active")[0].id == "mzf-block-set") return; // 已在设置界面, 跳出
+    $("a.router-link-exact-active.active").removeClass();
+    $("#mzf-block-set").addClass("router-link-exact-active active"); //切换左侧侧栏按钮激活样式
+    $("div.col-md-9>.manage-card").css("display", "none"); // 隐藏原dom，不要删除或替换，会导致原生切换失效
+    if (!$("#mzf-manage-card").length)
+      $("div.col-md-9>.manage-card").after(setHtml); // 设置页dom不存在,添加dom
+    $("#mzf-manage-card").css("display", "flex"); // 显示dom
     $("#mzf-input-id1")[0].value = blockManager("blockCommentId").get();
     $("#mzf-input-id2")[0].value = blockManager("blockArchiveId").get();
   }
