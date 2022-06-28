@@ -19,9 +19,9 @@
   const host = "cangku.icu";
   const regUserId = new RegExp("/user/(\\d+)");
   const regArchive = new RegExp(`${host}/archives/\\d+`);
-  const regHome = new RegExp(`${host}/(\\?page=\\d+)?`);
+  const regHome = new RegExp(`${host}/($|\\?page=\\d+)`);
   const regRank = new RegExp(`${host}/rank`);
-  const regCategory = new RegExp(`${host}/(\\?page=\\d+)?`);
+  const regCategory = new RegExp(`${host}/category/\\?page=\\d+`);
   const regAccount = new RegExp(`${host}/account`);
   const regNoti = new RegExp(`${host}/notification\\?type=reply`);
   const regUserPage = new RegExp(`${host}/user/\\d+`);
@@ -92,7 +92,8 @@
       addArchiveBtn();
     } else if (
       href.match(regHome) ||
-      href.match(regCategory || href.match(regRank))
+      href.match(regCategory) ||
+      href.match(regRank)
     ) {
       observer2 = new MutationObserver(HomeHandler);
       observer2.observe(
