@@ -40,48 +40,59 @@
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setHtml =
-    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword" type="text" class="form-control"></div> <div class="form-group"><label for="block-mode">屏蔽方式</label><select id="block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id:</label><input id="mzf-input-category-id" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为"***") </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
   const MutationObserver =
     window.MutationObserver ||
     window.WebKitMutationObserver ||
     window.MozMutationObserver;
+  var observer1, observer2, observer3;
+
+  /**
+   * @description: 生成一个block列表(用户id,分类id,关键词)的管理实例
+   * @param {*} listName block列表名称
+   * @return {*} 管理实例, 包含增删查改
+   */
   function blockManager(listName) {
     let idListStr = GM_getValue(listName) || "";
     let idList = new Set(idListStr.split(/\s+/));
     return {
       get() {
+        // 获取block列表
         return idListStr;
       },
       set(newIdList) {
+        // 设置新的block列表
         GM_setValue(listName, Array.from(new Set(newIdList)).join(" "));
       },
       add(id) {
+        // 添加block条目(可以是用户id,分类id或关键词)
         idList.add(id);
         GM_setValue(listName, Array.from(idList).join(" "));
       },
       remove(id) {
+        // 删除block条目
         idList.delete(id);
         GM_setValue(listName, Array.from(idList).join(" "));
       },
       isBlock(id) {
+        // 检查表内是否存在block条目
         return idList.has(id);
       },
     };
   }
-  var observer1, observer2, observer3;
 
   // 主函数入口
   function main() {
+    addBtnListen();
+    addObserver();
+  }
+
+  function addObserver() {
+    let href = location.href;
     let observer = new MutationObserver(urlChangeHandler);
     observer.observe($("head > title")[0], {
       childList: true,
     });
-    listenBtn();
-    start();
-  }
-
-  function start() {
-    let href = location.href;
     if (href.match(regArchive)) {
       // 评论列表并不会立即加载, 添加轮询
       observer1 = new MutationObserver(ArchiveHandler);
@@ -119,7 +130,7 @@
     observer1 && observer1.disconnect();
     observer2 && observer2.disconnect();
     observer3 && observer3.disconnect();
-    start();
+    addObserver();
   }
 
   function ArchiveHandler() {
@@ -136,7 +147,7 @@
 
   function NotiHandler() {
     killComment2();
-    $("time").each((index, item) => {
+    $("time").each((_, item) => {
       if (!$(item).next("#mzf-block-comment2").length) $(item).after(notiBtn);
     });
   }
@@ -312,7 +323,7 @@
     });
   }
 
-  function listenBtn() {
+  function addBtnListen() {
     // 预先绑定好按钮事件
     $(document).on("click", "#mzf-block-archive", onBlockArchive);
     $(document).on("click", "#mzf-block-comment", onBlockComment);
