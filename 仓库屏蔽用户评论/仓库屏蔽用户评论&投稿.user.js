@@ -49,8 +49,10 @@
 
   /**
    * @description: 生成一个block列表(用户id,分类id,关键词)的管理实例
-   * @param {*} listName block列表名称
-   * @return {*} 管理实例, 包含增删查改
+   * @param {*} listName block列表名称, 取值如下:
+   * blockArchiveId: 屏蔽帖子的用户id blockCommentId: 屏蔽评论的用户id blockCategoryId: 屏蔽帖子的分类id
+   * blockArchiveKeyword: 屏蔽帖子的关键词 blockCommentKeyword: 屏蔽评论的关键词
+   * @return {*} 管理实例, 包含增删查改的接口
    */
   function blockManager(listName) {
     let idListStr = GM_getValue(listName) || "";
