@@ -391,10 +391,15 @@
       // 处理屏蔽
       if (isBlock) {
         // 符合屏蔽规则, 按屏蔽模式执行对应修改
-        item.css("display", "none");
+        if (config["archiveBlockMode"] == "hidden")
+          item.css("display", "none"); // 隐藏
+        else if (config["archiveBlockMode"] == "blur")
+          // 高斯模糊
+          item.find("div.post-card-content").css("filter", "blur(1.2rem)");
       } else {
         // 不符合屏蔽规则, 恢复元素CSS
         item.css("display", "block");
+        item.find("div.post-card-content").css("filter", "none");
       }
     });
   }
