@@ -45,7 +45,23 @@
     window.MutationObserver ||
     window.WebKitMutationObserver ||
     window.MozMutationObserver;
+  const configList = {
+    // 配置数据条目以及对应的初值
+    blockArchiveId: "",
+    blockCommentId: "",
+    blockCategoryId: "",
+    blockArchiveKeyword: "",
+    blockCommentKeyword: "",
+    archiveBlockMode: "hidden",
+    commentBlockMode: "hidden",
+  };
+  const config = {}; // 预缓存GM本地存储内的配置数据
   var observer1, observer2, observer3;
+
+  function reloadConfig() {
+    for (let key in configList)
+      config[key] = GM_getValue(key) || configList[key];
+  } // 重载配置数据
 
   /**
    * @description: 生成一个block列表(用户id,分类id,关键词)的管理实例
@@ -55,7 +71,7 @@
    * @return {*} 管理实例, 包含增删查改的接口
    */
   function blockManager(listName) {
-    let listStr = GM_getValue(listName) || ""; // 表数据
+    let listStr = config[listName]; // 表数据
     let listType, separator, list;
     if (listName.includes("Id")) {
       listType = "Id";
@@ -68,23 +84,25 @@
     } else return null; // 表名不正确
 
     return {
-      get() {
-        // 获取表数据
-        return listStr;
-      },
       set(newList) {
         // 设置新表
-        GM_setValue(listName, Array.from(new Set(newList)).join(separator));
+        let configVal = Array.from(new Set(newList)).join(separator);
+        config[listName] = configVal;
+        GM_setValue(listName, configVal);
       },
       add(ele) {
         // 添加条目(可以是用户id,分类id或关键词)
         list.add(ele);
-        GM_setValue(listName, Array.from(list).join(separator));
+        let configVal = Array.from(list).join(separator);
+        config[listName] = configVal;
+        GM_setValue(listName, configVal);
       },
       remove(ele) {
         // 删除条目
         list.delete(ele);
-        GM_setValue(listName, Array.from(list).join(separator));
+        let configVal = Array.from(list).join(separator);
+        config[listName] = configVal;
+        GM_setValue(listName, configVal);
       },
       isBlock(ele) {
         // 检查表内是否存在block条目, id类list返回bool, keyword类list则返回识别到的keyword条目或空字符串
@@ -99,6 +117,7 @@
 
   // 主函数入口
   function main() {
+    reloadConfig();
     addBtnListen();
     addObserver();
   }
@@ -253,16 +272,31 @@
     if (!$("#mzf-manage-card").length)
       $("div.col-md-9>.manage-card").after(setHtml); // 设置页dom不存在,添加dom
     $("#mzf-manage-card").css("display", "flex"); // 显示dom
-    $("#mzf-input-id1")[0].value = blockManager("blockCommentId").get();
-    $("#mzf-input-id2")[0].value = blockManager("blockArchiveId").get();
+    $("#mzf-input-id1")[0].value = config["blockCommentId"];
+    $("#mzf-input-id2")[0].value = config["blockArchiveId"];
+    $("#mzf-input-id3")[0].value = config["blockCategoryId"];
+    $("#mzf-input-keyword1")[0].value = config["blockCommentKeyword"];
+    $("#mzf-input-keyword2")[0].value = config["blockArchiveKeyword"];
   }
 
   function onSaveSetingBtn() {
     let blockCommentId = $("#mzf-input-id1")[0].value.split(/\s+/);
     let blockArchiveId = $("#mzf-input-id2")[0].value.split(/\s+/);
+    let blockCategoryId = $("#mzf-input-id3")[0].value.split(/\s+/);
+    let blockCommentKeyword = $("#mzf-input-keyword1")[0]
+      .value.split(",")
+      .map((str) => str.trim()); // 关键词列表使用trim方法修剪处理以保证准确性
+    let blockArchiveKeyword = $("#mzf-input-keyword2")[0]
+      .value.split(",")
+      .map((str) => str.trim());
+    config["archiveBlockMode"] = $("#archiveBlockMode")[0].value;
+    config["commentBlockMode"] = $("#commentBlockMode")[0].value;
     blockManager("blockCommentId").set(blockCommentId);
     blockManager("blockArchiveId").set(blockArchiveId);
-    alert("设置成功");
+    blockManager("blockCategoryId").set(blockCategoryId);
+    blockManager("blockCommentKeyword").set(blockCommentKeyword);
+    blockManager("blockArchiveKeyword").set(blockArchiveKeyword);
+    alert("设置成功, 刷新页面生效");
   }
 
   function onBlockArchive() {
