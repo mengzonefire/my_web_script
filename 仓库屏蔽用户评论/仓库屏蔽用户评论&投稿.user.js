@@ -50,35 +50,49 @@
   /**
    * @description: 生成一个block列表(用户id,分类id,关键词)的管理实例
    * @param {*} listName block列表名称, 取值如下:
-   * blockArchiveId: 屏蔽帖子的用户id blockCommentId: 屏蔽评论的用户id blockCategoryId: 屏蔽帖子的分类id
-   * blockArchiveKeyword: 屏蔽帖子的关键词 blockCommentKeyword: 屏蔽评论的关键词
+   * blockArchiveId: 屏蔽帖子的用户id blockCommentId: 屏蔽评论的用户id blockCategoryId: 屏蔽帖子的分类id (空格分隔符)
+   * blockArchiveKeyword: 屏蔽帖子的关键词 blockCommentKeyword: 屏蔽评论的关键词 (","英文逗号分隔符)
    * @return {*} 管理实例, 包含增删查改的接口
    */
   function blockManager(listName) {
-    let idListStr = GM_getValue(listName) || "";
-    let idList = new Set(idListStr.split(/\s+/));
+    let listStr = GM_getValue(listName) || ""; // 表数据
+    let listType, separator, list;
+    if (listName.includes("Id")) {
+      listType = "Id";
+      separator = " ";
+      list = new Set(listStr.split(/\s+/));
+    } else if (listName.includes("Keyword")) {
+      listType = "Keyword";
+      separator = ",";
+      list = new Set(listStr.split(","));
+    } else return null; // 表名不正确
+
     return {
       get() {
-        // 获取block列表
-        return idListStr;
+        // 获取表数据
+        return listStr;
       },
-      set(newIdList) {
-        // 设置新的block列表
-        GM_setValue(listName, Array.from(new Set(newIdList)).join(" "));
+      set(newList) {
+        // 设置新表
+        GM_setValue(listName, Array.from(new Set(newList)).join(separator));
       },
-      add(id) {
-        // 添加block条目(可以是用户id,分类id或关键词)
-        idList.add(id);
-        GM_setValue(listName, Array.from(idList).join(" "));
+      add(ele) {
+        // 添加条目(可以是用户id,分类id或关键词)
+        list.add(ele);
+        GM_setValue(listName, Array.from(list).join(separator));
       },
-      remove(id) {
-        // 删除block条目
-        idList.delete(id);
-        GM_setValue(listName, Array.from(idList).join(" "));
+      remove(ele) {
+        // 删除条目
+        list.delete(ele);
+        GM_setValue(listName, Array.from(list).join(separator));
       },
-      isBlock(id) {
-        // 检查表内是否存在block条目
-        return idList.has(id);
+      isBlock(ele) {
+        // 检查表内是否存在block条目, id类list返回bool, keyword类list则返回识别到的keyword条目或空字符串
+        if (listType == "Id") return list.has(ele);
+        else if (listType == "Keyword")
+          for (let keyword of Array.from(list))
+            if (keyword && ele.includes(keyword)) return keyword;
+        return "";
       },
     };
   }
@@ -315,13 +329,39 @@
 
   function killArchive() {
     $("div.post").each((index, item) => {
+      let isblock = false;
       item = $(item);
-      let checkELe = item.find("a.meta-label");
-      if (!checkELe.length) return;
+
+      // 按用户id屏蔽文章 (优先执行)
+      let checkELe = item.find("a.meta-label"); // 查找文章作者标签元素
+      if (!checkELe.length) return; // 未找到识别元素->非正常的投稿列表项(可能是广告元素), 跳出
       let userId = checkELe[0].href.match(regUserId)[1];
-      if (blockManager("blockArchiveId").isBlock(userId))
+      if (blockManager("blockArchiveId").isBlock(userId)) isblock = true;
+
+      // 按标题关键字屏蔽 (若已屏蔽则不执行)
+      if (!isblock) {
+        checkELe = item.find("div.title");
+        if (!checkELe.length) return;
+        let keyword = blockManager("blockArchiveKeyword").isBlock(
+          checkELe[0].textContent
+        );
+        if (keyword) {
+          checkELe[0].innerHTML = checkELe[0].innerHTML.replaceAll(
+            keyword,
+            `<span style="color: red">${keyword}</span>`
+          ); // 将标题内识别到的屏蔽关键词标红
+          isblock = true;
+        }
+      }
+
+      // 处理屏蔽
+      if (isBlock) {
+        // 符合屏蔽规则, 按屏蔽模式执行对应修改
         item.css("display", "none");
-      else item.css("display", "block");
+      } else {
+        // 不符合屏蔽规则, 恢复元素CSS
+        item.css("display", "block");
+      }
     });
   }
 
