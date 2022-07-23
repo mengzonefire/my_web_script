@@ -39,8 +39,12 @@
     '<a id="mzf-block-comment2" href="javascript:;" style="margin-left:5px;white-space:nowrap;">屏蔽用户</a>'; //通知页评论屏蔽按钮
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
-  const setHtml =
-    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id:</label><input id="mzf-input-category-id" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为"***") </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+  const setCard =
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id:</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为"***") </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+  const disableblurBtn =
+    '<button id="disable-blur-btn" type="button" class="btn btn-info" style="z-index: 2; position: absolute; top: 50%; left: 50%; transform: scale(1.3) translate(-38%, -63%);">已屏蔽,点击显示</button>';
+  const blurWrapper =
+    '<div id="disable-click-wrapper" style=" width: 100%; height: 100%; z-index: 1; position: absolute; "></div>';
   const MutationObserver =
     window.MutationObserver ||
     window.WebKitMutationObserver ||
@@ -86,12 +90,12 @@
     return {
       set(newList) {
         // 设置新表
-        let configVal = Array.from(new Set(newList)).join(separator);
+        let configVal = Array.from(new Set(newList)).join(separator); // 使用set结构实现去重
         config[listName] = configVal;
         GM_setValue(listName, configVal);
       },
       add(ele) {
-        // 添加条目(可以是用户id,分类id或关键词)
+        // 添加条目(可以是用户id,分类id或关键词), 元数据使用set结构存储, 自带去重
         list.add(ele);
         let configVal = Array.from(list).join(separator);
         config[listName] = configVal;
@@ -270,13 +274,15 @@
     $("#mzf-block-set").addClass("router-link-exact-active active"); //切换左侧侧栏按钮激活样式
     $("div.col-md-9>.manage-card").css("display", "none"); // 隐藏原dom，不要删除或替换，会导致原生切换失效
     if (!$("#mzf-manage-card").length)
-      $("div.col-md-9>.manage-card").after(setHtml); // 设置页dom不存在,添加dom
+      $("div.col-md-9>.manage-card").after(setCard); // 设置页dom不存在,添加dom
     $("#mzf-manage-card").css("display", "flex"); // 显示dom
     $("#mzf-input-id1")[0].value = config["blockCommentId"];
     $("#mzf-input-id2")[0].value = config["blockArchiveId"];
     $("#mzf-input-id3")[0].value = config["blockCategoryId"];
     $("#mzf-input-keyword1")[0].value = config["blockCommentKeyword"];
     $("#mzf-input-keyword2")[0].value = config["blockArchiveKeyword"];
+    $("#archive-block-mode")[0].value = config["archiveBlockMode"];
+    $("#comment-block-mode")[0].value = config["commentBlockMode"];
   }
 
   function onSaveSetingBtn() {
@@ -289,8 +295,10 @@
     let blockArchiveKeyword = $("#mzf-input-keyword2")[0]
       .value.split(",")
       .map((str) => str.trim());
-    config["archiveBlockMode"] = $("#archiveBlockMode")[0].value;
-    config["commentBlockMode"] = $("#commentBlockMode")[0].value;
+    config["archiveBlockMode"] = $("#archive-block-mode")[0].value;
+    config["commentBlockMode"] = $("#comment-block-mode")[0].value;
+    GM_setValue("archiveBlockMode", config["archiveBlockMode"]);
+    GM_setValue("commentBlockMode", config["commentBlockMode"]);
     blockManager("blockCommentId").set(blockCommentId);
     blockManager("blockArchiveId").set(blockArchiveId);
     blockManager("blockCategoryId").set(blockCategoryId);
@@ -389,17 +397,26 @@
       }
 
       // 处理屏蔽
-      if (isBlock) {
+      if (isblock) {
         // 符合屏蔽规则, 按屏蔽模式执行对应修改
         if (config["archiveBlockMode"] == "hidden")
           item.css("display", "none"); // 隐藏
-        else if (config["archiveBlockMode"] == "blur")
-          // 高斯模糊
+        else if (config["archiveBlockMode"] == "blur") {
+          // 高斯模糊&添加解除模糊按钮&禁用a标签
           item.find("div.post-card-content").css("filter", "blur(1.2rem)");
+          if (!item.find("#disable-blur-btn").length) {
+            item
+              .find("section.post-card-wrap")
+              .prepend(disableblurBtn + blurWrapper);
+          }
+        }
       } else {
-        // 不符合屏蔽规则, 恢复元素CSS
-        item.css("display", "block");
-        item.find("div.post-card-content").css("filter", "none");
+        // 不符合屏蔽规则, 恢复元素CSS, 去除按钮
+        item
+          .css("display", "block")
+          .find("div.post-card-content")
+          .css("filter", "none");
+        item.find("#disable-click-wrapper, #disable-blur-btn").remove();
       }
     });
   }
@@ -411,6 +428,13 @@
     $(document).on("click", "#mzf-block-comment2", onBlockComment2);
     $(document).on("click", "#mzf-block-set", onSetingBtn);
     $(document).on("click", "#mzf-save-id", onSaveSetingBtn);
+    $(document).on("click", "#disable-blur-btn", (btn) => {
+      let ele = $(btn.target);
+      ele.siblings("div.post-card-content").css("filter", "none"); // 全图界面
+      ele.siblings("a").find("div.post-card-content").css("filter", "none"); // 缩略图界面
+      ele.siblings("#disable-click-wrapper").remove();
+      ele.remove();
+    });
   }
 
   $(main);
