@@ -38,11 +38,11 @@
   const notiBtn =
     '<a id="mzf-block-comment2" href="javascript:;" style="margin-left:5px;white-space:nowrap;">屏蔽用户</a>'; //通知页评论屏蔽按钮
   const categoryBtn =
-    '<button id="category-block-btn" data="0" type="button" class="btn btn-primary">屏蔽分类: </button>'; // 分类屏蔽按钮
+    '<button id="category-block-btn" categoryId="0" categoryStr="" type="button" class="btn btn-primary">屏蔽分类: </button>'; // 分类屏蔽按钮
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setCard =
-    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id:</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为"***") </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号","分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id:</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为***) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
   const disableblurBtn =
     '<button id="disable-blur-btn" type="button" class="btn btn-info" style="z-index: 2; position: absolute; top: 50%; left: 50%; transform: scale(1.3) translate(-38%, -63%);">已屏蔽,点击显示</button>';
   const blurWrapper =
@@ -91,20 +91,20 @@
 
     return {
       set(newList) {
-        // 设置新表
+        // 设置表, 注意参数newList为Array<String>类型
         let configVal = Array.from(new Set(newList)).join(separator); // 使用set结构实现去重
         config[listName] = configVal;
         GM_setValue(listName, configVal);
       },
       add(ele) {
-        // 添加条目(可以是用户id,分类id或关键词), 元数据使用set结构存储, 自带去重
+        // 添加表条目(可以是用户id,分类id或关键词), 元数据使用set结构存储, 自带去重
         list.add(ele);
         let configVal = Array.from(list).join(separator);
         config[listName] = configVal;
         GM_setValue(listName, configVal);
       },
       remove(ele) {
-        // 删除条目
+        // 删除表条目
         list.delete(ele);
         let configVal = Array.from(list).join(separator);
         config[listName] = configVal;
@@ -186,20 +186,25 @@
       $("span.view.meta-label").after(homeBtn);
     let categoryBtnTarget = $("ul.list.reset-ul-style.second-category");
     if (categoryBtnTarget.length) {
+      // 添加分类屏蔽按钮
       let checkELe = $(
         "div.simple-navbar.text-center a.router-link-exact-active.active"
       );
       let categoryId = checkELe[0].href.match(regCategory)[1];
+      let blocked = blockManager("blockCategoryId").isBlock(categoryId);
       let categoryStr = checkELe[0].innerHTML;
       let btn = $("#category-block-btn");
       if (btn.length)
-        btn.attr("data", categoryId).html(`屏蔽分类: ${categoryStr}`);
+        btn
+          .attr({ categoryId: categoryId, categoryStr: categoryStr })
+          .html(`${blocked ? "解除屏蔽" : "屏蔽分类"}: ${categoryStr}`);
+      // 按钮存在, 更新数据
       else
         categoryBtnTarget.before(
           $(categoryBtn)
-            .attr("data", categoryId)
-            .html(`屏蔽分类: ${categoryStr}`)
-        );
+            .attr({ categoryId: categoryId, categoryStr: categoryStr })
+            .html(`${blocked ? "解除屏蔽" : "屏蔽分类"}: ${categoryStr}`)
+        ); // 按钮不存在, 添加按钮
     }
   }
 
@@ -330,7 +335,7 @@
     let ckeckEle = $(this).parents("div.post").find("a.meta-label");
     if (ckeckEle.length) {
       blockManager("blockArchiveId").add(ckeckEle[0].href.match(regUserId)[1]);
-      alert("屏蔽成功");
+      alert(`帖子作者: ${ckeckEle[0].innerHTML} 屏蔽成功`);
       killArchive();
     }
   }
@@ -351,7 +356,7 @@
     let ckeckEle = $(this).parents("div.content-wrap").find("a.author");
     if (ckeckEle.length) {
       blockManager("blockCommentId").add(ckeckEle[0].href.match(regUserId)[1]);
-      alert("屏蔽成功");
+      alert(`评论用户: ${ckeckEle[0].innerHTML} 屏蔽成功`);
       killComment();
     }
   }
@@ -364,7 +369,7 @@
       blockManager("blockCommentId").add(
         ckeckEle[0].children[0].href.match(regUserId)[1]
       );
-      alert("屏蔽成功");
+      alert(`评论用户: ${ckeckEle[0].children[0].innerHTML} 屏蔽成功`);
       killComment2();
     }
   }
@@ -474,7 +479,18 @@
       ele.siblings("#disable-click-wrapper").remove();
       ele.remove();
     });
-    $(document).on("click", "#category-block-btn", () => {});
+    $(document).on("click", "#category-block-btn", (btn) => {
+      let ele = $(btn.target);
+      let blocked = !blockManager("blockCategoryId").isBlock(
+        ele.attr("categoryId")
+      );
+      blocked
+        ? blockManager("blockCategoryId").add(ele.attr("categoryId"))
+        : lockManager("blockCategoryId").remove(ele.attr("categoryId"));
+      ele.html(
+        `${blocked ? "解除屏蔽" : "屏蔽分类"}: ${ele.attr("categoryStr")}`
+      );
+    });
   }
 
   $(main);
