@@ -21,7 +21,7 @@
   const regArchive = new RegExp(`${host}/archives/\\d+`);
   const regHome = new RegExp(`${host}/($|\\?page=\\d+)`);
   const regRank = new RegExp(`${host}/rank`);
-  const regCategory = new RegExp(`${host}/category/\\?page=\\d+`);
+  const regCategory = new RegExp(`${host}/category/(\\d+)($|\\?page=\\d+)`);
   const regAccount = new RegExp(`${host}/account`);
   const regNoti = new RegExp(`${host}/notification\\?type=reply`);
   const regUserPage = new RegExp(`${host}/user/\\d+`);
@@ -37,6 +37,8 @@
     '<a id="mzf-block-comment" href="javascript:;" class="operate-btn"> 屏蔽用户 </a>'; //帖子下的评论屏蔽按钮
   const notiBtn =
     '<a id="mzf-block-comment2" href="javascript:;" style="margin-left:5px;white-space:nowrap;">屏蔽用户</a>'; //通知页评论屏蔽按钮
+  const categoryBtn =
+    '<button id="category-block-btn" data="0" type="button" class="btn btn-primary">屏蔽分类: </button>'; // 分类屏蔽按钮
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setCard =
@@ -60,7 +62,7 @@
     commentBlockMode: "hidden",
   };
   const config = {}; // 预缓存GM本地存储内的配置数据
-  var observer1, observer2, observer3;
+  var observer1, observer2, observer3, page;
 
   function reloadConfig() {
     for (let key in configList)
@@ -182,6 +184,23 @@
     killArchive();
     if (!$("#mzf-block-archive").length)
       $("span.view.meta-label").after(homeBtn);
+    let categoryBtnTarget = $("ul.list.reset-ul-style.second-category");
+    if (categoryBtnTarget.length) {
+      let checkELe = $(
+        "div.simple-navbar.text-center a.router-link-exact-active.active"
+      );
+      let categoryId = checkELe[0].href.match(regCategory)[1];
+      let categoryStr = checkELe[0].innerHTML;
+      let btn = $("#category-block-btn");
+      if (btn.length)
+        btn.attr("data", categoryId).html(`屏蔽分类: ${categoryStr}`);
+      else
+        categoryBtnTarget.before(
+          $(categoryBtn)
+            .attr("data", categoryId)
+            .html(`屏蔽分类: ${categoryStr}`)
+        );
+    }
   }
 
   function NotiHandler() {
@@ -370,6 +389,7 @@
   }
 
   function killArchive() {
+    let isCategoryPage = location.href.match(regCategory);
     $("div.post").each((index, item) => {
       let isblock = false;
       item = $(item);
@@ -378,7 +398,10 @@
       let checkELe = item.find("a.meta-label"); // 查找文章作者标签元素
       if (!checkELe.length) return; // 未找到识别元素->非正常的投稿列表项(可能是广告元素), 跳出
       let userId = checkELe[0].href.match(regUserId)[1];
-      if (blockManager("blockArchiveId").isBlock(userId)) isblock = true;
+      if (blockManager("blockArchiveId").isBlock(userId)) {
+        checkELe.find("span.author").css("color", "red"); // 将作者标红
+        isblock = true;
+      }
 
       // 按标题关键字屏蔽 (若已屏蔽则不执行)
       if (!isblock) {
@@ -393,6 +416,19 @@
             `<span style="color: red">${keyword}</span>`
           ); // 将标题内识别到的屏蔽关键词标红
           isblock = true;
+        }
+      }
+
+      // 按分类屏蔽 (若已屏蔽则不执行, 若在分类页面也不执行)
+      if (!isblock && !isCategoryPage) {
+        checkELe = item.find("a.category");
+        for (let ele of checkELe) {
+          let result = ele.href.match(regCategory);
+          if (result && blockManager("blockCategoryId").isBlock(result[1])) {
+            isblock = true;
+            $(ele).css("color", "red");
+            break;
+          }
         }
       }
 
@@ -415,7 +451,10 @@
         item
           .css("display", "block")
           .find("div.post-card-content")
-          .css("filter", "none");
+          .css("filter", "none")
+          .find("span.author")
+          .css("color", "");
+        item.find("a.category").css("color", "");
         item.find("#disable-click-wrapper, #disable-blur-btn").remove();
       }
     });
@@ -435,6 +474,7 @@
       ele.siblings("#disable-click-wrapper").remove();
       ele.remove();
     });
+    $(document).on("click", "#category-block-btn", () => {});
   }
 
   $(main);
