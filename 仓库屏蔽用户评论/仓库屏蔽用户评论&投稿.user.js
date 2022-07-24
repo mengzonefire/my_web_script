@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name              仓库屏蔽用户评论&帖子
-// @description       提供屏蔽绅士仓库的用户评论和用户帖子的功能
+// @name              绅士仓库评论帖子屏蔽
+// @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.0.5
+// @version           1.1.0
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -47,6 +47,8 @@
     '<button id="disable-blur-btn" type="button" class="btn btn-info" style="z-index: 2; position: absolute; top: 50%; left: 50%; transform: scale(1.3) translate(-38%, -63%);">已屏蔽,点击显示</button>';
   const blurWrapper =
     '<div id="disable-click-wrapper" style=" width: 100%; height: 100%; z-index: 1; position: absolute; "></div>';
+  const scriptHomePage = "https://greasyfork.org/zh-CN/scripts/445959";
+  const domParseFail = `DOM解析失败, 请前往反馈:\n${scriptHomePage}`;
   const MutationObserver =
     window.MutationObserver ||
     window.WebKitMutationObserver ||
@@ -167,32 +169,41 @@
   }
 
   // 页面变化事件回调handler定义
+  // url变化回调
   function urlChangeHandler() {
+    // 页面变更, 重绑定监听器
     observer1 && observer1.disconnect();
     observer2 && observer2.disconnect();
     observer3 && observer3.disconnect();
     addObserver();
   }
 
+  // 帖子内的评论列表变化回调
   function ArchiveHandler() {
     killComment();
+
+    // 由于评论列表为动态加载, 故在此回调内添加评论屏蔽按钮
     if (!$("#mzf-block-comment").length)
       $("div.comment-operate").append(commentBtn);
   }
 
+  // 主页的帖子列表变化回调
   function HomeHandler() {
     killArchive();
+
+    // 由于帖子列表为动态加载, 故在此回调内添加帖子屏蔽按钮
     if (!$("#mzf-block-archive").length)
       $("span.view.meta-label").after(homeBtn);
+
+    // 添加分类屏蔽按钮
     let categoryBtnTarget = $("ul.list.reset-ul-style.second-category");
     if (categoryBtnTarget.length) {
-      // 添加分类屏蔽按钮
       let checkELe = $(
         "div.simple-navbar.text-center a.router-link-exact-active.active"
       );
-      let categoryId = checkELe[0].href.match(regCategory)[1];
+      let categoryId = checkELe.attr("href").match(regCategory)[1];
       let blocked = blockManager("blockCategoryId").isBlock(categoryId);
-      let categoryStr = checkELe[0].innerHTML;
+      let categoryStr = checkELe.text();
       let btn = $("#category-block-btn");
       if (btn.length)
         btn
@@ -208,40 +219,45 @@
     }
   }
 
+  // 通知页的评论列表变化回调
   function NotiHandler() {
-    killComment2();
+    killComment(true);
+
+    // 由于评论列表为动态加载, 故在此回调内添加评论屏蔽按钮
     $("time").each((_, item) => {
       if (!$(item).next("#mzf-block-comment2").length) $(item).after(notiBtn);
     });
   }
 
-  // DOM按钮添加函数定义
+  // DOM按钮添加方法定义
+  // 添加帖子内的帖子屏蔽按钮
   function addArchiveBtn() {
     if ($("#mzf-archive-action").length) return;
     let target = $("article div.header div.meta");
     let userId = [...target[0].children[0].href.matchAll(/user\/(\d+)/g)][0];
     if (!userId) return; // 未加载到href属性
     userId = userId[1];
-    let isblockArc = blockManager("blockArchiveId").isBlock(userId);
+    let blocked = blockManager("blockArchiveId").isBlock(userId);
     let blockArchiveBtn = $(archiveBtn)
-      .attr({ userId: userId, isblockArc: isblockArc })
-      .text(isblockArc ? "解除屏蔽" : "屏蔽作者")
+      .attr("userId", userId)
+      .text(blocked ? "解除屏蔽" : "屏蔽作者")
       .on("click", onBlockArchive2);
     target.append(blockArchiveBtn);
   }
 
+  // 添加用户主页的按钮(屏蔽帖子和评论)
   function addUserBtn() {
     if ($("#mzf-user-action").length) return;
     let userId = location.href.match(/user\/(\d+)/)[1];
     let isblockArc = blockManager("blockArchiveId").isBlock(userId);
     let isblockCom = blockManager("blockCommentId").isBlock(userId);
     let blockArchiveBtn = $(userBtn)
-      .attr({ userId: userId, isblockArc: isblockArc })
+      .attr("userId", userId)
       .text(isblockArc ? "解除帖子屏蔽" : "屏蔽用户帖子")
       .addClass(isblockArc ? "btn-success" : "")
       .on("click", onUserBlockArchiveBtn);
     let bnBlockCommentBtn = $(userBtn)
-      .attr({ userId: userId, isblockCom: isblockCom })
+      .attr("userId", userId)
       .text(isblockCom ? "解除评论屏蔽" : "屏蔽用户评论")
       .addClass(isblockCom ? "btn-danger" : "btn-secondary")
       .on("click", onUserBlockCommentBtn);
@@ -250,6 +266,7 @@
     );
   }
 
+  // 添加设置按钮
   function addSetBtn() {
     $("li.menu-list-item a").click(() => {
       $("#mzf-block-set").removeClass();
@@ -264,36 +281,33 @@
   }
 
   // 按钮事件定义
+  // 用户主页的帖子屏蔽按钮
   function onUserBlockArchiveBtn(btn) {
-    let ele = btn.target;
-    ele.setAttribute("isblockArc", !eval(ele.getAttribute("isblockArc")));
-    if (eval(ele.getAttribute("isblockArc"))) {
-      ele.innerText = "解除帖子屏蔽";
-      ele.classList.add("btn-success");
-      blockManager("blockArchiveId").add(ele.getAttribute("userId"));
-    } else {
-      ele.innerText = "屏蔽用户帖子";
-      ele.classList.remove("btn-success");
-      blockManager("blockArchiveId").remove(ele.getAttribute("userId"));
-    }
+    let ele = $(btn.target);
+    let blocked = !blockManager("blockArchiveId").isBlock(ele.attr("userId"));
+    ele.html(blocked ? "解除帖子屏蔽" : "屏蔽用户帖子");
+    blocked ? ele.addClass("btn-success") : ele.removeClass("btn-success");
+    blocked
+      ? blockManager("blockArchiveId").add(ele.attr("userId"))
+      : blockManager("blockArchiveId").remove(ele.attr("userId"));
   }
 
+  // 用户主页的评论屏蔽按钮
   function onUserBlockCommentBtn(btn) {
-    let ele = btn.target;
-    ele.setAttribute("isblockCom", !eval(ele.getAttribute("isblockCom")));
-    if (eval(ele.getAttribute("isblockCom"))) {
-      ele.innerText = "解除评论屏蔽";
-      ele.classList.replace("btn-secondary", "btn-danger");
-      blockManager("blockCommentId").add(ele.getAttribute("userId"));
-    } else {
-      ele.innerText = "屏蔽用户评论";
-      ele.classList.replace("btn-danger", "btn-secondary");
-      blockManager("blockCommentId").remove(ele.getAttribute("userId"));
-    }
+    let ele = $(btn.target);
+    let blocked = !blockManager("blockCommentId").isBlock(ele.attr("userId"));
+    ele.html(blocked ? "解除评论屏蔽" : "屏蔽用户评论");
+    ele.removeClass(blocked ? "btn-secondary" : "btn-danger");
+    ele.addClass(blocked ? "btn-danger" : "btn-secondary");
+    blocked
+      ? blockManager("blockCommentId").add(ele.attr("userId"))
+      : blockManager("blockCommentId").remove(ele.attr("userId"));
   }
 
+  // 设置按钮回调
   function onSetingBtn() {
-    if ($("a.router-link-exact-active.active")[0].id == "mzf-block-set") return; // 已在设置界面, 跳出
+    if ($("a.router-link-exact-active.active").attr("id") == "mzf-block-set")
+      return; // 已在设置界面, 跳出
     $("a.router-link-exact-active.active").removeClass();
     $("#mzf-block-set").addClass("router-link-exact-active active"); //切换左侧侧栏按钮激活样式
     $("div.col-md-9>.manage-card").css("display", "none"); // 隐藏原dom，不要删除或替换，会导致原生切换失效
@@ -309,6 +323,7 @@
     $("#comment-block-mode")[0].value = config["commentBlockMode"];
   }
 
+  // 设置界面保存按钮回调
   function onSaveSetingBtn() {
     let blockCommentId = $("#mzf-input-id1")[0].value.split(/\s+/);
     let blockArchiveId = $("#mzf-input-id2")[0].value.split(/\s+/);
@@ -331,68 +346,97 @@
     alert("设置成功, 刷新页面生效");
   }
 
-  function onBlockArchive() {
-    let ckeckEle = $(this).parents("div.post").find("a.meta-label");
-    if (ckeckEle.length) {
-      blockManager("blockArchiveId").add(ckeckEle[0].href.match(regUserId)[1]);
-      alert(`帖子作者: ${ckeckEle[0].innerHTML} 屏蔽成功`);
+  //帖子外的帖子屏蔽按钮回调, 无状态
+  function onBlockArchive(btn) {
+    let ele = $(btn.target).parents("div.post").find("a.meta-label");
+    let userId = ele.attr("href").match(regUserId)[1];
+    if (ele.length && userId) {
+      blockManager("blockArchiveId").add(userId);
+      alert(`帖子作者: ${ele.html()} 屏蔽成功`);
       killArchive();
-    }
+    } else alert(domParseFail);
   }
 
+  // 帖子内的帖子屏蔽按钮回调, 包含两种状态
   function onBlockArchive2(btn) {
-    let ele = btn.target;
-    ele.setAttribute("isblockArc", !eval(ele.getAttribute("isblockArc")));
-    if (eval(ele.getAttribute("isblockArc"))) {
-      ele.innerText = "解除屏蔽";
-      blockManager("blockArchiveId").add(ele.getAttribute("userId"));
-    } else {
-      ele.innerText = "屏蔽作者";
-      blockManager("blockArchiveId").remove(ele.getAttribute("userId"));
-    }
+    let ele = $(btn.target);
+    let blocked = !blockManager("blockArchiveId").isblock(ele.attr("userId"));
+    ele.html(blocked ? "解除屏蔽" : "屏蔽作者");
+    blocked
+      ? blockManager("blockArchiveId").add(ele.attr("userId"))
+      : blockManager("blockArchiveId").remove(ele.attr("userId"));
   }
 
-  function onBlockComment() {
-    let ckeckEle = $(this).parents("div.content-wrap").find("a.author");
+  // 帖子内的评论条目的屏蔽按钮, 以及通知页的回复评论屏蔽按钮回调
+  function onBlockComment(btn, isNotiPage = false) {
+    let ckeckEle = isNotiPage
+      ? $(btn.target).parents("a.notification-item").find("div.notice a")
+      : $(btn.target).parents("div.content-wrap").find("div.comment-meta a");
     if (ckeckEle.length) {
-      blockManager("blockCommentId").add(ckeckEle[0].href.match(regUserId)[1]);
-      alert(`评论用户: ${ckeckEle[0].innerHTML} 屏蔽成功`);
+      blockManager("blockCommentId").add(ckeckEle.attr("href"));
+      alert(`评论用户: ${ckeckEle.html()} 屏蔽成功`);
       killComment();
-    }
+    } else alert(domParseFail);
   }
 
-  function onBlockComment2() {
-    let ckeckEle = $(this)
-      .parents("a.notification-item")
-      .find("div.avatar-wrapper");
-    if (ckeckEle.length) {
-      blockManager("blockCommentId").add(
-        ckeckEle[0].children[0].href.match(regUserId)[1]
-      );
-      alert(`评论用户: ${ckeckEle[0].children[0].innerHTML} 屏蔽成功`);
-      killComment2();
-    }
+  // DOM屏蔽实现
+  // 屏蔽评论
+  function killComment(isNotiPage = false) {
+    $(isNotiPage ? "a.notification-item" : "div.comment-body li[id]").each(
+      (index, item) => {
+        item = $(item);
+        let isblock = false;
+        let commentEle = item.find("div.comment span");
+        let blockKeyword = "";
+
+        // 按用户id屏蔽评论 (优先执行)
+        let checkELe = item.find(
+          isNotiPage ? "div.notice" : "div.comment-meta"
+        );
+        if (!checkELe.length) return;
+        let userId = checkELe.find("a");
+        if (
+          blockManager("blockCommentId").isBlock(
+            userId.attr("href").match(regUserId)[1]
+          )
+        ) {
+          isblock = true;
+          userId.css("color", "red"); // 将用户昵称标红
+          // 将下方的屏蔽按钮替换为显示按钮(用于解除文本打码)
+        }
+
+        // 按评论关键字屏蔽 (若已屏蔽则不执行)
+        if (!isblock) {
+          blockKeyword = blockManager("blockCommentKeyword").isBlock(
+            commentEle.html()
+          );
+          isblock = Boolean(blockKeyword);
+        }
+
+        // 处理屏蔽
+        if (isblock) {
+          // 符合屏蔽规则, 按屏蔽模式执行对应修改
+          if (config["commentBlockMode"] == "hidden")
+            item.css("display", "none"); // 隐藏
+          else if (config["archiveBlockMode"] == "replace") {
+            commentEle.attr("oriContent", commentEle.html()); // 备份评论内容
+            blockKeyword
+              ? commentEle.html(
+                  commentEle
+                    .html()
+                    .replaceAll(
+                      blockKeyword,
+                      "".padStart(blockKeyword.length, "*")
+                    )
+                )
+              : commentEle.html("".padStart(commentEle.text().length, "*")); // 文字打码, 若为用户id屏蔽则将整条评论替换为等长星号，若为关键词屏蔽则仅替换关键词
+          }
+        }
+      }
+    );
   }
 
-  // 屏蔽DOM元素实现
-  function killComment() {
-    $("div.comment-body li[id]").each((index, item) => {
-      let checkELe = $(item).find("div.avatar-wrap");
-      if (!checkELe.length) return;
-      let userId = checkELe[0].children[0].href.match(regUserId)[1];
-      if (blockManager("blockCommentId").isBlock(userId)) item.remove();
-    });
-  }
-
-  function killComment2() {
-    $("a.notification-item").each((index, item) => {
-      let checkELe = $(item).find("div.avatar-wrapper");
-      if (!checkELe.length) return;
-      let userId = checkELe[0].children[0].href.match(regUserId)[1];
-      if (blockManager("blockCommentId").isBlock(userId)) item.remove();
-    });
-  }
-
+  //屏蔽帖子
   function killArchive() {
     let isCategoryPage = location.href.match(regCategory);
     $("div.post").each((index, item) => {
@@ -402,7 +446,7 @@
       // 按用户id屏蔽文章 (优先执行)
       let checkELe = item.find("a.meta-label"); // 查找文章作者标签元素
       if (!checkELe.length) return; // 未找到识别元素->非正常的投稿列表项(可能是广告元素), 跳出
-      let userId = checkELe[0].href.match(regUserId)[1];
+      let userId = checkELe.attr("href").match(regUserId)[1];
       if (blockManager("blockArchiveId").isBlock(userId)) {
         checkELe.find("span.author").css("color", "red"); // 将作者标红
         isblock = true;
@@ -413,12 +457,13 @@
         checkELe = item.find("div.title");
         if (!checkELe.length) return;
         let keyword = blockManager("blockArchiveKeyword").isBlock(
-          checkELe[0].textContent
+          checkELe.text()
         );
         if (keyword) {
-          checkELe[0].innerHTML = checkELe[0].innerHTML.replaceAll(
-            keyword,
-            `<span style="color: red">${keyword}</span>`
+          checkELe.html(
+            checkELe
+              .html()
+              .replaceAll(keyword, `<span style="color: red">${keyword}</span>`)
           ); // 将标题内识别到的屏蔽关键词标红
           isblock = true;
         }
@@ -468,8 +513,10 @@
   function addBtnListen() {
     // 预先绑定好按钮事件
     $(document).on("click", "#mzf-block-archive", onBlockArchive);
-    $(document).on("click", "#mzf-block-comment", onBlockComment);
-    $(document).on("click", "#mzf-block-comment2", onBlockComment2);
+    $(document).on("click", "#mzf-block-comment", (btn) => onBlockComment(btn));
+    $(document).on("click", "#mzf-block-comment2", (btn) =>
+      onBlockComment(btn, true)
+    );
     $(document).on("click", "#mzf-block-set", onSetingBtn);
     $(document).on("click", "#mzf-save-id", onSaveSetingBtn);
     $(document).on("click", "#disable-blur-btn", (btn) => {
