@@ -8,8 +8,10 @@
 // @icon              https://cangku.icu/favicon.ico
 // @match             *://cangku.icu/*
 // @require           https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js
+// @require           https://unpkg.com/ajax-hook@2.1.3/dist/ajaxhook.min.js
 // @grant             GM_setValue
 // @grant             GM_getValue
+// @grant             unsafeWindow
 // @run-at            document-start
 // ==/UserScript==
 !(function () {
@@ -18,7 +20,7 @@
   // 全局变常量声明
   const host = "cangku.icu";
   const regUserId = new RegExp("/user/(\\d+)");
-  const regArchive = new RegExp("/archives/\\d+");
+  const regArchive = new RegExp("/archives/(\\d+)");
   const regHome = new RegExp(`${host}/($|\\?page=\\d+)`);
   const regRank = new RegExp("/rank");
   const regCategory = new RegExp("/category/(\\d+)($|\\?page=\\d+)");
@@ -64,6 +66,7 @@
     commentBlockMode: "hidden",
   };
   const config = {}; // 预缓存GM本地存储内的配置数据
+  const categoryData = {}; // {"archieveId":[catagoryIdList]}
   var observer1, observer2, observer3;
 
   function reloadConfig() {
@@ -133,6 +136,7 @@
     addObserver();
   }
 
+  // 绑定dom监听器
   function addObserver() {
     let href = location.href;
     let observer = new MutationObserver(urlChangeHandler);
@@ -201,7 +205,6 @@
     let categoryBtnTarget = $("ul.list.reset-ul-style.second-category");
     if (categoryBtnTarget.length) {
       let checkELe = $("div.simple-navbar a.active:last");
-      console.log(checkELe.attr("href"));
       let categoryId = checkELe.attr("href").match(regCategory);
       if (categoryId) {
         categoryId = categoryId[1];
@@ -526,13 +529,27 @@
       // 按分类屏蔽 (若已屏蔽则不执行, 若在分类页面也不执行)
       if (!isblock && !isCategoryPage) {
         checkELe = item.find("a.category");
-        for (let ele of checkELe) {
-          let result = ele.href.match(regCategory);
-          if (result && blockManager("blockCategoryId").isBlock(result[1])) {
-            isblock = true;
-            $(ele).css("color", "red");
-            break;
+        if (checkELe.length)
+          // 存在分类标签
+          for (let ele of checkELe) {
+            let result = ele.href.match(regCategory);
+            if (result && blockManager("blockCategoryId").isBlock(result[1])) {
+              isblock = true;
+              $(ele).css("color", "red"); // 将屏蔽的分类标签标红
+              break;
+            }
           }
+        // 缩略图模式不存在分类标签, 使用元数据进行识别
+        else {
+          checkELe = item.find("section.post-card-wrap a:first");
+          if (checkELe.length)
+            for (let id of categoryData[
+              checkELe.attr("href").match(regArchive)[1]
+            ])
+              if (blockManager("blockCategoryId").isBlock(id)) {
+                isblock = true;
+                break;
+              }
         }
       }
 
@@ -593,5 +610,28 @@
     });
   }
 
+  // 由于缩略图模式下dom内没有帖子分类数据, 故通过拦截请求获取帖子列表元数据
+  function addAjaxHook() {
+    ah.proxy(
+      {
+        onResponse: (response, handler) => {
+          if (response.config.url.includes("/api/v1/post/list?page="))
+            // 仅对投稿列表的请求做处理
+            for (let data of JSON.parse(response.response).data)
+              categoryData[String(data.id)] = data.categories.reduce(
+                (list, category) => {
+                  list.push(String(category.id));
+                  return list;
+                },
+                []
+              ); // 提取分类数据
+          handler.next(response);
+        },
+      },
+      unsafeWindow
+    );
+  }
+
   $(main);
+  addAjaxHook();
 })();
