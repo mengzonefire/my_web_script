@@ -2,7 +2,7 @@
 // @name              绅士仓库评论帖子屏蔽
 // @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.1.1
+// @version           1.1.2
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -443,7 +443,7 @@
       // 按用户id屏蔽评论 (优先执行)
       let checkELe = item.find(targetId);
       if (!checkELe.length) return;
-      let userId = checkELe.find("a");
+      let userId = checkELe.find("a:first");
       if (
         blockManager("blockCommentId").isBlock(
           userId.attr("href").match(regUserId)[1]
