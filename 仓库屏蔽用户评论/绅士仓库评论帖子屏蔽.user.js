@@ -2,7 +2,7 @@
 // @name              绅士仓库评论帖子屏蔽
 // @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.1.2
+// @version           1.1.3
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -355,7 +355,7 @@
     alert("设置成功, 刷新页面生效");
   }
 
-  //帖子外的帖子屏蔽按钮回调, 无状态
+  // 帖子外的帖子屏蔽按钮回调, 无状态
   function onBlockArchive(btn) {
     // 已是屏蔽状态, 执行恢复模糊操作
     if ($(btn.target).text() == "恢复模糊") {
@@ -499,6 +499,12 @@
     $("div.post").each((index, item) => {
       let isblock = false;
       item = $(item);
+
+      // 给广告元素添加block: none以防止屏蔽帖子后元素排序异常(现象为出现空位)
+      if (item.find("div.ad-box").length) {
+        item.css("display", "none");
+        return;
+      }
 
       // 按用户id屏蔽文章 (优先执行)
       let checkELe = item.find("a.meta-label:first"); // 查找文章作者标签元素
