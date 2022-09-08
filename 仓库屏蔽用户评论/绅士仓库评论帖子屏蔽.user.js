@@ -2,7 +2,7 @@
 // @name              绅士仓库评论帖子屏蔽
 // @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.1.3
+// @version           1.1.4
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -44,7 +44,7 @@
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setCard =
-    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id (此规则在缩略图模式和分类页面不生效):</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为***) </option> </select></div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id (黑名单, 此规则在分类页面不生效):</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label>仅显示帖子分类id (白名单, 此规则优先于黑名单, 在分类页面不生效):</label><input id="mzf-input-id4" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为***) </option> </select></div> <div class="form-group"> <label>常用功能开关:</label> <div class="row align-items-center"> <div class="form-check form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="archive-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">帖子屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="comment-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="author-comment-only"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论区只显示作者</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="block-latest-comment"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">隐藏主页最新评论</label> </div> </div> </div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
   const disableblurBtn =
     '<button id="disable-blur-btn" type="button" class="btn btn-info" style="z-index: 2; position: absolute; top: 50%; left: 50%; transform: scale(1.3) translate(-38%, -63%);">已屏蔽,点击显示</button>';
   const blurWrapper =
@@ -419,6 +419,14 @@
     } else alert(domParseFail);
   }
 
+  // 设置页switch开关的单击回调
+  function onSetingSwitch(ele) {
+    ele = $(ele.target);
+    ele.parent().toggleClass("is-checked");
+    let input = ele.siblings()[0];
+    input.checked = !input.checked;
+  }
+
   // DOM屏蔽实现
   // 屏蔽评论
   function killComment(isNotiPage = false, isHome = false) {
@@ -596,6 +604,7 @@
     );
     $(document).on("click", "#mzf-block-set", onSetingBtn);
     $(document).on("click", "#mzf-save-id", onSaveSetingBtn);
+    $(document).on("click", ".mzf-switch", onSetingSwitch);
     $(document).on("click", "#disable-blur-btn", (btn) => {
       let ele = $(btn.target);
       ele.siblings("div.post-card-content").css("filter", "none"); // 全图界面
