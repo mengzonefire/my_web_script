@@ -44,7 +44,7 @@
   const setBtn =
     '<li class="menu-list-item"><a id="mzf-block-set" href="javascript:;">屏蔽设置</a></li>'; //账户设置页的设置按钮
   const setCard =
-    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id (黑名单, 此规则在分类页面不生效):</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label>仅显示帖子分类id (白名单, 此规则优先于黑名单, 在分类页面不生效):</label><input id="mzf-input-id4" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为***) </option> </select></div> <div class="form-group"> <label>常用功能开关:</label> <div class="row align-items-center"> <div class="form-check form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="archive-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">帖子屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="comment-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="author-comment-only"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论区只显示作者</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="block-latest-comment"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">隐藏主页最新评论</label> </div> </div> </div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
+    '<div id="mzf-manage-card" class="card manage-card"> <div class="card-header"> <h3 class="title">屏蔽设置</h3> </div> <div class="card-body"> <p>用户id获取: 用户主页 -&gt; https://cangku.icu/user/[用户id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽评论的用户id:</label><input id="mzf-input-id1" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽帖子的用户id:</label><input id="mzf-input-id2" type="text" class="form-control"> </div> <div class="form-group"><label>屏蔽评论关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword1" type="text" class="form-control"></div> <div class="form-group"><label>屏蔽帖子标题关键字 (多个关键字以英文逗号 , 分隔):</label><input id="mzf-input-keyword2" type="text" class="form-control"></div> <p>分类id获取: 分类页面 -&gt; https://cangku.icu/category/[分类id]; 每条id用空格分隔</p> <div class="form-group"><label>屏蔽帖子分类id (黑名单, 此规则在分类页和排行页不生效):</label><input id="mzf-input-id3" type="text" class="form-control"> </div> <div class="form-group"><label>仅显示帖子分类id (白名单, 此规则优先于黑名单, 在分类页和排行页不生效):</label><input id="mzf-input-id4" type="text" class="form-control"> </div> <div class="form-group"><label for="block-mode">帖子屏蔽方式:</label><select id="archive-block-mode" class="form-control"> <option value="hidden"> 隐藏 (直接隐藏帖子,不显示) </option> <option value="blur"> 模糊 (模糊帖子标题和封面) </option> </select></div> <div class="form-group"><label for="block-mode">评论屏蔽方式:</label><select id="comment-block-mode" class="form-control"> <option value="hidden"> 隐藏 (隐藏评论及相关回复,即整楼隐藏) </option> <option value="replace"> 打码 (整条评论或屏蔽的关键词替换为***) </option> </select></div> <div class="form-group"> <label>常用功能开关:</label> <div class="row align-items-center"> <div class="form-check form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="archive-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">帖子屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="comment-block-switch"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论屏蔽总开关</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="author-comment-only"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">评论区只显示作者</label> </div> <div class="form-switch col-auto"> <div role="switch" class="el-switch mzf-switch" size="large"><input type="checkbox" class="el-switch__input" id="block-latest-comment"> <span class="el-switch__core" style="width: 40px;"></span> </div><label class="form-check-label ml-1">隐藏主页最新评论</label> </div> </div> </div> <div id="" class="form-group pt-4 mb-0"><button id="mzf-save-id" class="el-button el-button--success el-button--medium"><span>保存修改</span></button></div> </div> </div>'; // 设置界面
   const disableblurBtn =
     '<button id="disable-blur-btn" type="button" class="btn btn-info" style="z-index: 2; position: absolute; top: 50%; left: 50%; transform: scale(1.3) translate(-38%, -63%);">已屏蔽,点击显示</button>';
   const blurWrapper =
@@ -72,11 +72,19 @@
   };
   const config = {}; // 预缓存GM本地存储内的配置数据
   const categoryData = {}; // {"archieveId":[catagoryIdList]}
+  const key2IdDict = {
+    blockLatestComment: "block-latest-comment",
+    authorCommentOnly: "author-comment-only",
+    commentBlockSwitch: "comment-block-switch",
+    archiveBlockSwitch: "archive-block-switch",
+  }; // 几个功能开关的 key:id 键值对
   var observer1, observer2, observer3;
 
   function reloadConfig() {
-    for (let key in configList)
-      config[key] = GM_getValue(key) || configList[key];
+    for (let key in configList) {
+      let val = GM_getValue(key);
+      config[key] = val === undefined ? configList[key] : val;
+    }
   } // 重载配置数据
 
   /**
@@ -162,15 +170,16 @@
       href.match(regRank)
     ) {
       href.match(regHome) && killComment(false, true); // 在主页时, 对右侧5条最新评论执行检查
-      observer2 = new MutationObserver(HomeHandler);
-      observer2.observe(
-        $(
-          "div.post-list>span.row, div.category-post>span.row, div.rank-post>span.row"
-        )[0],
-        {
-          childList: true,
-        }
+      let target = $(
+        "div.post-list>span.row, div.category-post>span.row, div.rank-post>span.row"
       );
+      if (target.length) {
+        observer2 && observer2.disconnect(); // 解除多余绑定防止卡顿
+        observer2 = new MutationObserver(HomeHandler);
+        observer2.observe(target[0], {
+          childList: true,
+        });
+      }
     } else if (href.match(regNoti)) {
       observer3 = new MutationObserver(NotiHandler);
       observer3.observe($("div.notification-list")[0], {
@@ -336,6 +345,14 @@
     $("#mzf-input-keyword2")[0].value = config["blockArchiveKeyword"];
     $("#archive-block-mode")[0].value = config["archiveBlockMode"];
     $("#comment-block-mode")[0].value = config["commentBlockMode"];
+    for (let key in key2IdDict) {
+      let id = key2IdDict[key];
+      if (config[key]) {
+        let btn = $(`#${id}`);
+        btn[0].checked = true;
+        btn.parent().addClass("is-checked");
+      }
+    }
   }
 
   // 设置界面保存按钮回调
@@ -360,6 +377,11 @@
     blockManager("showCategoryId").set(showCategoryId);
     blockManager("blockCommentKeyword").set(blockCommentKeyword);
     blockManager("blockArchiveKeyword").set(blockArchiveKeyword);
+    for (let key in key2IdDict) {
+      let id = key2IdDict[key];
+      config[key] = $(`#${id}`)[0].checked;
+      GM_setValue(key, config[key]);
+    }
     alert("设置成功, 刷新页面生效");
   }
 
@@ -562,12 +584,12 @@
             }
           }
         // 缩略图模式不存在分类标签, 使用元数据进行识别
+        // 只有列表接口有分类元数据, 排行接口均没有, 故无法执行此规则
         else {
           checkELe = item.find("section.post-card-wrap a:first");
-          if (checkELe.length)
-            for (let id of categoryData[
-              checkELe.attr("href").match(regArchive)[1]
-            ])
+          let archieveId = checkELe.attr("href").match(regArchive)[1];
+          if (checkELe.length && archieveId in categoryData)
+            for (let id of categoryData[archieveId])
               if (blockManager("blockCategoryId").isBlock(id)) {
                 isblock = true;
                 break;
