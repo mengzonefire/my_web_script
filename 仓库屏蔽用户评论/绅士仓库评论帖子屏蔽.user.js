@@ -62,8 +62,13 @@
     blockCategoryId: "",
     blockArchiveKeyword: "",
     blockCommentKeyword: "",
+    showCategoryId: "",
     archiveBlockMode: "hidden",
     commentBlockMode: "hidden",
+    archiveBlockSwitch: true,
+    commentBlockSwitch: true,
+    authorCommentOnly: false,
+    blockLatestComment: false,
   };
   const config = {}; // 预缓存GM本地存储内的配置数据
   const categoryData = {}; // {"archieveId":[catagoryIdList]}
@@ -77,8 +82,8 @@
   /**
    * @description: 生成一个block列表(用户id,分类id,关键词)的管理实例
    * @param {*} listName block列表名称, 取值如下:
-   * blockArchiveId: 屏蔽帖子的用户id blockCommentId: 屏蔽评论的用户id blockCategoryId: 屏蔽帖子的分类id (空格分隔符)
-   * blockArchiveKeyword: 屏蔽帖子的关键词 blockCommentKeyword: 屏蔽评论的关键词 (英文逗号 , 分隔符)
+   * blockArchiveId: 屏蔽帖子的用户id blockCommentId: 屏蔽评论的用户id blockCategoryId: 屏蔽帖子的分类id (黑名单, 空格分隔符)
+   * blockArchiveKeyword: 屏蔽帖子的关键词 blockCommentKeyword: 屏蔽评论的关键词 (英文逗号 , 分隔符) showCategoryId: 仅显示帖子的分类id (白名单)
    * @return {*} 管理实例, 包含增删查改的接口
    */
   function blockManager(listName) {
@@ -326,6 +331,7 @@
     $("#mzf-input-id1")[0].value = config["blockCommentId"];
     $("#mzf-input-id2")[0].value = config["blockArchiveId"];
     $("#mzf-input-id3")[0].value = config["blockCategoryId"];
+    $("#mzf-input-id4")[0].value = config["showCategoryId"];
     $("#mzf-input-keyword1")[0].value = config["blockCommentKeyword"];
     $("#mzf-input-keyword2")[0].value = config["blockArchiveKeyword"];
     $("#archive-block-mode")[0].value = config["archiveBlockMode"];
@@ -337,6 +343,7 @@
     let blockCommentId = $("#mzf-input-id1")[0].value.split(/\s+/);
     let blockArchiveId = $("#mzf-input-id2")[0].value.split(/\s+/);
     let blockCategoryId = $("#mzf-input-id3")[0].value.split(/\s+/);
+    let showCategoryId = $("#mzf-input-id4")[0].value.split(/\s+/);
     let blockCommentKeyword = $("#mzf-input-keyword1")[0]
       .value.split(",")
       .map((str) => str.trim()); // 关键词列表使用trim方法修剪处理以保证准确性
@@ -350,6 +357,7 @@
     blockManager("blockCommentId").set(blockCommentId);
     blockManager("blockArchiveId").set(blockArchiveId);
     blockManager("blockCategoryId").set(blockCategoryId);
+    blockManager("showCategoryId").set(showCategoryId);
     blockManager("blockCommentKeyword").set(blockCommentKeyword);
     blockManager("blockArchiveKeyword").set(blockArchiveKeyword);
     alert("设置成功, 刷新页面生效");
