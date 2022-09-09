@@ -2,7 +2,7 @@
 // @name              绅士仓库评论帖子屏蔽
 // @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.1.4
+// @version           1.2.1
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -166,6 +166,9 @@
           childList: true,
           subtree: true,
         });
+        // 提前执行隐藏以提升效果速度
+        if (config["blockLatestComment"])
+          $("ul.comment.reset-ul-style").css("display", "none"); // 隐藏右侧 "最新评论"
         addArchiveBtn();
       }
     } else if (
