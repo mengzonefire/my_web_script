@@ -569,12 +569,12 @@
       let checkELe = item.find("a.meta-label:first"); // 查找文章作者标签元素
 
       // 给广告元素添加block: none以防止屏蔽帖子后元素排序异常(现象为出现空位)
-      if (item.find("div.ad-box").length) {
-        // 未找到识别元素->非正常的投稿列表项(可能是广告元素), 隐藏并跳出
-        if (!checkELe.length) item.css("display", "none");
+      if (item.find("div.ad-box").length && !checkELe.length) {
+        item.css("display", "none");
         return;
       }
 
+      // 未找到识别元素->非正常的投稿列表项(可能是广告元素), 隐藏并跳出
       if (!checkELe.length) return;
 
       // 按用户id屏蔽文章 (优先执行)
