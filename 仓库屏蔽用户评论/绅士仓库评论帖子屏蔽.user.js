@@ -2,7 +2,7 @@
 // @name              绅士仓库评论帖子屏蔽
 // @description       提供绅士仓库 评论和帖子 的屏蔽功能, 支持按用户、分类、关键字屏蔽
 // @namespace         moe.cangku.mengzonefire
-// @version           1.2.2
+// @version           1.2.3
 // @author            mengzonefire
 // @license           MIT
 // @icon              https://cangku.icu/favicon.ico
@@ -470,10 +470,10 @@
   // DOM屏蔽实现
   // 屏蔽评论
   function killComment(isNotiPage = false, isHome = false) {
-    if (!config["commentBlockSwitch"]) return; // 总开关
     if (config["blockLatestComment"])
       $("ul.comment.reset-ul-style").css("display", "none"); // 隐藏右侧 "最新评论"
-    let targetEle = "div.comment-body li[id], ul.comment li div.body", // 帖子内也显示 "最新评论", 计入识别范围
+    if (!config["commentBlockSwitch"] && !config["authorCommentOnly"]) return; // 评论屏蔽总开关, 若开启 "帖子内只显示作者评论" 则不跳出
+    let targetEle = "div.comment-body li[id], ul.comment li div.body", // 帖子内也有显示 "最新评论", 计入识别范围
       targetId = "div.auther-name, div.comment-meta:first", // 评论列表元素存在嵌套(评论回复)
       targetContent = "div.content a, div.comment-text:first", // 评论内容元素
       tagEle = "span.level, span.author-mark, span.role-mark"; // 评论用户标签元素, 分别为 等级, 作者, 编辑;
